@@ -10,7 +10,7 @@ class CdkStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        fn = _lambda.Function(
+        test_fn = _lambda.Function(
             self,
             "TestFunction",
             runtime=_lambda.Runtime.PYTHON_3_13,
@@ -18,9 +18,28 @@ class CdkStack(Stack):
             code=_lambda.Code.from_asset("lambda")
         )
 
-        endpoint = apigw.LambdaRestApi(
+        new_chapter_fn = _lambda.Function(
             self,
-            "ApiGwTest",
-            handler=fn,
-            rest_api_name="test"
+            "NewChapterFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="new_chapter_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda")
+        )
+
+        api = apigw.RestApi(
+            self,
+            "LehighApiGw",
+            rest_api_name="LehighApiGw"
+        )
+
+        test_resource = api.root.add_resource("test")
+        test_resource.add_method(
+            "GET",
+            apigw.LambdaIntegration(test_fn)
+        )
+
+        new_resource = api.root.add_resource("new")
+        new_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(new_chapter_fn)
         )
