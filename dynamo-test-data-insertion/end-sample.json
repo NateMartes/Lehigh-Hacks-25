@@ -1,0 +1,52 @@
+[
+  {
+    "ch-key": "1ggs4",
+    "content": "The quick brown fox jumps over the lazy dog",
+    "choice": "a"
+  },
+  {
+    "ch-key": "2hht5",
+    "content": "Lorem ipsum dolor sit amet",
+    "choice": "b"
+  },
+  {
+    "ch-key": "3iir6",
+    "content": "Testing DynamoDB with sample data",
+    "choice": "c"
+  },
+  {
+    "ch-key": "4jjs7",
+    "content": "A journey of a thousand miles begins with a single step",
+    "choice": "a"
+  },
+  {
+    "ch-key": "5kkt8",
+    "content": "Data insertion via AWS SDK",
+    "choice": "d"
+  },
+  {
+    "ch-key": "6llu9",
+    "content": "Very happy with my purchase",
+    "choice": "b"
+  },
+  {
+    "ch-key": "7mmv0",
+    "content": "Sample content for query testing",
+    "choice": "a"
+  },
+  {
+    "ch-key": "8nnw1",
+    "content": "Exploring DynamoDB performance",
+    "choice": "c"
+  },
+  {
+    "ch-key": "9oox2",
+    "content": "Mock data for batch operations",
+    "choice": "d"
+  },
+  {
+    "ch-key": "0ppy3",
+    "content": "Final test data for validation",
+    "choice": "b"
+  }
+]
