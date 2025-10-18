@@ -1,0 +1,52 @@
+[
+  {
+    "ch-key": "abc1234",
+    "ch-num": 1,
+    "uid": "abcuser123"
+  },
+  {
+    "ch-key": "def5678",
+    "ch-num": 2,
+    "uid": "xyzuser456"
+  },
+  {
+    "ch-key": "ghi9012",
+    "ch-num": 3,
+    "uid": "testuser789"
+  },
+  {
+    "ch-key": "jkl3456",
+    "ch-num": 4,
+    "uid": "sampleuser101"
+  },
+  {
+    "ch-key": "mno7890",
+    "ch-num": 5,
+    "uid": "devuser202"
+  },
+  {
+    "ch-key": "pqr1234",
+    "ch-num": 6,
+    "uid": "appuser303"
+  },
+  {
+    "ch-key": "stu5678",
+    "ch-num": 7,
+    "uid": "qauser404"
+  },
+  {
+    "ch-key": "vwx9012",
+    "ch-num": 8,
+    "uid": "produser505"
+  },
+  {
+    "ch-key": "yza3456",
+    "ch-num": 9,
+    "uid": "testuser606"
+  },
+  {
+    "ch-key": "bcd7890",
+    "ch-num": 10,
+    "uid": "mockuser707"
+  }
+]

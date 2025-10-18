@@ -7,10 +7,10 @@ dynamodb = boto3.resource("dynamodb")
 
 # Mapping of JSON files to their respective DynamoDB tables
 file_to_table = {
-    "intro-sample.json": "intro",
-    "end-sample.json": "End",
-    "chapters-sample.json": "Chapters",
-    "questions-sample.json": "questions",
+    "intro-sample.json": "Intro",
+    # "end-sample.json": "End",
+    # "chapters-sample.json": "Chapters",
+    "questions-sample.json": "Questions",
 }
 
 
