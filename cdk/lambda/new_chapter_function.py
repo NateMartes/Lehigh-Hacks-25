@@ -7,11 +7,11 @@ def lambda_handler(event, context):
     user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
 
     dynamodb = boto3.resource("dynamodb")
-    chapter_table = dynamodb.Table(CHAPTERS_TABLE_NAME)
+    chapters_table = dynamodb.Table(CHAPTERS_TABLE_NAME)
 
-    ch_key = uuid.uuid4()
+    ch_key = str(uuid.uuid4())
 
-    chapter_table.put_item(
+    chapters_table.put_item(
         Item={
             "ch-key": ch_key,
             "uid": user_id
