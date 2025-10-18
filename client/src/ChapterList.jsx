@@ -1,7 +1,23 @@
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from "react-router-dom";
 
 export default function ChapterList() {
+
+  const navigate = useNavigate();
+
+  function handleCardClick(event) {
+    let key = event.currentTarget.dataset.chapter;
+    navigate(`/survey/${key}`);
+  }
+
+  function createNewChapter() {
+    
+    // Create new chapter and get back a key
+    let key = "a-brand-new-key"
+    navigate(`/survey/${key}`);
+  }
+
   const cards = [
     {
       number: 1,
@@ -27,14 +43,14 @@ export default function ChapterList() {
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {cards.map((card) => (
-              <Card key={card.number} className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Card key={card.number} data-chapter={card.ch_key} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={handleCardClick}>
                 <CardHeader>
                   <CardTitle className="text-xl">Chapter {card.number}</CardTitle>
                 </CardHeader>
               </Card>
             ))}
           </div>
-          <Button className="bg-gray-400 hover:bg-gray-600 w-fit">Create a New Chapter</Button>
+          <Button className="bg-gray-400 hover:bg-gray-600 w-fit" onClick={createNewChapter}>Create a New Chapter</Button>
         </div>
       </div>
     </div>
