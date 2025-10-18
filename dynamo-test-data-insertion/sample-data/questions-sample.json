@@ -1,0 +1,52 @@
+[
+  {
+    "ch-key": "agfdut64",
+    "question-num": 1,
+    "content": "What is my question?"
+  },
+  {
+    "ch-key": "bhgver75",
+    "question-num": 2,
+    "content": "How does DynamoDB handle scaling?"
+  },
+  {
+    "ch-key": "cifwfs86",
+    "question-num": 3,
+    "content": "What are the benefits of NoSQL databases?"
+  },
+  {
+    "ch-key": "djgxgt97",
+    "question-num": 4,
+    "content": "How to optimize query performance?"
+  },
+  {
+    "ch-key": "ekhyhu08",
+    "question-num": 5,
+    "content": "What is the role of partition keys?"
+  },
+  {
+    "ch-key": "fliziv19",
+    "question-num": 6,
+    "content": "How to implement batch writes in DynamoDB?"
+  },
+  {
+    "ch-key": "gmjajw20",
+    "question-num": 7,
+    "content": "What are DynamoDB streams used for?"
+  },
+  {
+    "ch-key": "hnkbkx31",
+    "question-num": 8,
+    "content": "How to secure data in DynamoDB?"
+  },
+  {
+    "ch-key": "iolcly42",
+    "question-num": 9,
+    "content": "What is the cost structure of DynamoDB?"
+  },
+  {
+    "ch-key": "jpmdmz53",
+    "question-num": 10,
+    "content": "How to integrate DynamoDB with AWS Lambda?"
+  }
+]
