@@ -1,0 +1,92 @@
+[
+  {
+    "ch-key": "test-python-123",
+    "content": "Inserted via Python using IAM user!",
+    "options": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  {
+    "ch-key": "test-python-456",
+    "content": "Sample data for DynamoDB testing",
+    "options": [
+      "X",
+      "Y",
+      "Z"
+    ]
+  },
+  {
+    "ch-key": "test-python-789",
+    "content": "Created for batch write operation",
+    "options": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ]
+  },
+  {
+    "ch-key": "test-python-101",
+    "content": "Testing scalability with Python SDK",
+    "options": [
+      "Red",
+      "Blue"
+    ]
+  },
+  {
+    "ch-key": "test-python-102",
+    "content": "Mock data for query performance",
+    "options": [
+      "True",
+      "False"
+    ]
+  },
+  {
+    "ch-key": "test-python-103",
+    "content": "Inserted via boto3 client",
+    "options": [
+      "High",
+      "Medium",
+      "Low"
+    ]
+  },
+  {
+    "ch-key": "test-python-104",
+    "content": "Sample for DynamoDB streams",
+    "options": [
+      "Start",
+      "Stop",
+      "Pause"
+    ]
+  },
+  {
+    "ch-key": "test-python-105",
+    "content": "Testing conditional writes",
+    "options": [
+      "Yes",
+      "No"
+    ]
+  },
+  {
+    "ch-key": "test-python-106",
+    "content": "Data for partition key testing",
+    "options": [
+      "Alpha",
+      "Beta",
+      "Gamma",
+      "Delta"
+    ]
+  },
+  {
+    "ch-key": "test-python-107",
+    "content": "Mock entry for API integration",
+    "options": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ]
+  }
+]
