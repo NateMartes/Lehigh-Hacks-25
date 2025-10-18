@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'DynamoDB Tables for Chapters, Intro, End, and Questions'
+
+Resources:
+  ChaptersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Chapters
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: ch-key
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ch-key
+          KeyType: HASH
+      Tags:
+        - Key: Name
+          Value: Chapters
+
+  IntroTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: intro
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: ch-key
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ch-key
+          KeyType: HASH
+      Tags:
+        - Key: Name
+          Value: intro
+
+  EndTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: End
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: ch-key
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ch-key
+          KeyType: HASH
+      Tags:
+        - Key: Name
+          Value: End
+
+  QuestionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: questions
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: ch-key
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ch-key
+          KeyType: HASH
+      Tags:
+        - Key: Name
+          Value: questions
+
+Outputs:
+  ChaptersTableName:
+    Description: Name of the Chapters table
+    Value: !Ref ChaptersTable
+    Export:
+      Name: !Sub '${AWS::StackName}-ChaptersTable'
+
+  IntroTableName:
+    Description: Name of the Intro table
+    Value: !Ref IntroTable
+    Export:
+      Name: !Sub '${AWS::StackName}-IntroTable'
+
+  EndTableName:
+    Description: Name of the End table
+    Value: !Ref EndTable
+    Export:
+      Name: !Sub '${AWS::StackName}-EndTable'
+
+  QuestionsTableName:
+    Description: Name of the Questions table
+    Value: !Ref QuestionsTable
+    Export:
+      Name: !Sub '${AWS::StackName}-QuestionsTable'
