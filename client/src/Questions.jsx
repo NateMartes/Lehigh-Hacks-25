@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useParams, useNavigate } from 'react-router-dom';
-
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import NavBar from './NavBar';
 
 function Question({ question, onAnswer, answered }) {
   return (
@@ -38,6 +38,7 @@ export default function QuestionList() {
 
   const params = useParams();
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   useEffect(() => {
 
@@ -54,12 +55,11 @@ export default function QuestionList() {
   }, [])
 
   function handleAnswer(answer) {
+
     setAnswers((prev) => ({
       ...prev,
       [currentIndex]: answer,
     }));
-
-    console.log(currentIndex);
 
     if (currentIndex < questions.length - 1) {
       setTimeout(() => {
@@ -68,37 +68,40 @@ export default function QuestionList() {
 
     } else {
         let key = params.chKey;
-        navigate(`/chapter/${key}`);
+        navigate(`/chapter/${key}`, {state: {number: state.number}});
     }
   };
 
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Quick Survey</h1>
-          
-          <div className="w-full bg-slate-200 rounded-full h-2">
-            <div
-              className="bg-amber-500 h-2 rounded-full transition-all"
-              style={{ width: `${progress}%` }}
-            />
+    <>
+      <NavBar/>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Quick Survey</h1>
+            
+            <div className="w-full bg-slate-200 rounded-full h-2">
+              <div
+                className="bg-amber-500 h-2 rounded-full transition-all"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="text-sm text-slate-600 mt-2">
+              Question {currentIndex + 1} of {questions.length}
+            </p>
           </div>
-          <p className="text-sm text-slate-600 mt-2">
-            Question {currentIndex + 1} of {questions.length}
-          </p>
-        </div>
 
-        <div className="mb-8">
-            <Question
-              question={questions[currentIndex]}
-              onAnswer={handleAnswer}
-              answered={answers[currentIndex] !== undefined}
-            />
+          <div className="mb-8">
+              <Question
+                question={questions[currentIndex]}
+                onAnswer={handleAnswer}
+                answered={answers[currentIndex] !== undefined}
+              />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
