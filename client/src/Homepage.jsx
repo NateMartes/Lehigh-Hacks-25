@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import ScrollToTopButton from './ScrollToTopButton';
 import { useState, useEffect } from "react";
 
-async function getAllChapters(updateChaptersFunc) {
+async function getAllChapters(updateChaptersFunc, setGettingChapters) {
     const session = await fetchAuthSession();
     const idToken = session.tokens?.idToken;
     const payload = idToken?.payload;
