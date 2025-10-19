@@ -169,7 +169,7 @@ class CdkStack(Stack):
             "POST",
             apigw.LambdaIntegration(gen_end_fn),
             authorizer=authorizer,
-            authorization_type=apigw.Authorization.COGNITO
+            authorization_type=apigw.AuthorizationType.COGNITO
         )
 
         test_dyndb_resource = api.root.add_resource("testdyndb")
