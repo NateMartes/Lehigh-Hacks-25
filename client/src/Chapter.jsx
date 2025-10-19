@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from '@/components/ui/button';
 import { useLocation, useParams } from 'react-router-dom'
+import { fetchAuthSession } from 'aws-amplify/auth';
 import NavBar from "./NavBar";
 import ScrollToTopButton from "./ScrollToTopButton";
 
