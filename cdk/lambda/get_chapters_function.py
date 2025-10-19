@@ -1,11 +1,18 @@
 import boto3
 import json
+from decimal import Decimal
 
 CHAPTERS_TABLE_NAME = "Chapters"
 CHAPTERS_KEY_NAME = "ch-key"
 CHAPTERS_NUM_NAME = "ch-num"
 CHAPTERS_UID_NAME = "uid"
 
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return int(obj) if obj % 1 == 0 else float(obj)
+        return super().default(obj)
+    
 def lambda_handler(event, context):
     query_params = event["queryStringParameters"]
     uid = query_params["uid"]
@@ -33,5 +40,5 @@ def lambda_handler(event, context):
     return {
         "statusCode": 200,
         "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps({"chapters": chapters})
+        "body": json.dumps({"chapters": chapters}, cls=DecimalEncoder)    
     }
