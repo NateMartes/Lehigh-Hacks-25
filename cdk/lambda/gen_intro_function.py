@@ -78,6 +78,8 @@ def get_qnas(questions):
 
     return qnas
 
+def create_options():
+
 
 def lambda_handler(event, context):
     user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
@@ -117,6 +119,8 @@ def lambda_handler(event, context):
 
         Now you are ready. Inspired by your responses, write a short slice of life inspired snippet for a character. 
         Stay gender neutral, and focus on the character's inner thoughts. Try to achieve around a 400 word snippet. 
+        End the snippet with a decision to make, and give 3 choices for the reader to make. Partition your response using vertical bars like so:
+        story || question1 || question2 || question3. do not label your sections or questions 
     """
 
     conversation = [
@@ -133,6 +137,13 @@ def lambda_handler(event, context):
         inferenceConfig={"maxTokens": 512, "temperature": 0.5, "topP": 0.9},
     )
 
+    content = response.split("||")[0]
+    option1 = response.split("||")[1]
+    option2 = response.split("||")[2]
+    option3 = response.split("||")[3]
+
+    options_list = [option1, option2, option3]
+
     # Extract and print the response text.
     generated_content = response["output"]["message"]["content"][0]["text"]
 
@@ -142,7 +153,7 @@ def lambda_handler(event, context):
         Item={
             INTRO_KEY_NAME: body["ch-key"],
             INTRO_CONTENT_NAME: generated_content,
-            INTRO_OPTIONS_NAME: "",
+            INTRO_OPTIONS_NAME: options_list,
         }
     )
 
