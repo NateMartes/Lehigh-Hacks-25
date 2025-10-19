@@ -4,7 +4,7 @@ import json
 END_TABLE_NAME = "End"
 CHAPTERS_KEY_NAME = "ch-key"
 END_CONTENT_NAME = "content"
-END_OPTIONS_NAME = "options"
+END_CHOICE_NAME = "choice"
 
 
 def lambda_handler(event, context):
@@ -27,7 +27,7 @@ def lambda_handler(event, context):
         if item[CHAPTERS_KEY_NAME] == ch_key:
             end_content = {
                 "content": item[END_CONTENT_NAME],
-                "choice": item[END_OPTIONS_NAME],
+                "choice": item[END_CHOICE_NAME],
             }
             break
 
