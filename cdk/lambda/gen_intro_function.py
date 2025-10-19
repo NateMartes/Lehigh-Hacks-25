@@ -71,9 +71,10 @@ def get_qnas(questions):
     questions_table = dynamodb.Table(QUESTIONS_TABLE_NAME)
     for question_item in questions:
         question = questions_table.get_item(
-            Key={QUESTIONS_ID_NAME: question_item["id"]}
+            Key={QUESTIONS_ID_NAME: question_item["question-id"]}
         )
 
+        print
         qnas[question["content"]] = question["answer"]
 
     return qnas
@@ -91,7 +92,8 @@ def lambda_handler(event, context):
             Key={
                 QUESTIONS_ID_NAME: question_item["question-id"],
             },
-            Item={QUESTIONS_ANSWER_NAME: question_item["answer"]},
+            UpdateExpression="SET answer = :answer",
+            ExpressionAttributeValues={":answer": question_item["answer"]},
         )
 
     previous_ending = get_prev_chapter_end(user_id)

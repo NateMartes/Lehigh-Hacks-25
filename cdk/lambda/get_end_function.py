@@ -18,17 +18,15 @@ def lambda_handler(event, context):
     items = response["Items"]
 
     while "LastEvaluatedKey" in response:
-        response = end_table.scan = end_table.scan(
-            ExclusiveStartKey=response["LastEvaluatedKey"]
-        )
+        response = end_table.scan(ExclusiveStartKey=response["LastEvaluatedKey"])
         items.extend(response["Items"])
 
     end_content = {}
     for item in items:
         if item[CHAPTERS_KEY_NAME] == ch_key:
             end_content = {
-                "end_content": item[END_CONTENT_NAME],
-                "option_selected": item[END_OPTIONS_NAME],
+                "content": item[END_CONTENT_NAME],
+                "choice": item[END_OPTIONS_NAME],
             }
             break
 
