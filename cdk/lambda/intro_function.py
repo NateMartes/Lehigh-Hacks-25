@@ -1,19 +1,87 @@
 import boto3
 import json
 
+END_TABLE_NAME = "End"
+END_CHOICE_NAME = "choice"
+END_CONTENT_NAME = "content"
+
+QUESTIONS_TABLE_NAME = "Questions"
+QUESTIONS_ID_NAME = "question-id"
+QUESTIONS_ANSWER_NAME = "answer"
+
+INTRO_TABLE_NAME = "Intro"
+INTRO_KEY_NAME = "ch-key"
+INTRO_CONTENT_NAME = "content"
+INTRO_OPTIONS_NAME = "options"
+
+CHAPTERS_TABLE_NAME = "Chapters"
+CHAPTERS_KEY_NAME = "ch-key"
+CHAPTERS_NUM_NAME = "ch-num"
+CHAPTERS_UID_NAME = "uid"
+
+MODEL_ID = "amazon.nova-lite-v1:0"
+
+
+def get_prev_chapter_end(user_id):
+    dynamodb = boto3.resource("dynamodb")
+    chapters_table = dynamodb.Table(CHAPTERS_TABLE_NAME)
+
+    ch_response = chapters_table.scan()
+    ch_items = ch_response["Items"]
+
+    while "LastEvaluatedKey" in ch_response:
+        ch_response = chapters_table.scan(
+            ExclusiveStartKey=ch_response["LastEvaluatedKey"]
+        )
+        ch_items.extend(ch_response["Items"])
+
+    prev_ch_key = ""
+    if ch_items:
+        user_items = [item for item in ch_items if item[CHAPTERS_UID_NAME] == user_id]
+        if user_items:
+            prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
+            user_items.remove(prev_item)
+            prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
+            if prev_item:
+                prev_ch_key = prev_item[CHAPTERS_KEY_NAME]
+
+    prev_end = {}
+    if prev_ch_key:
+        dynamodb = boto3.resource("dynamodb")
+        end_table = dynamodb.Table(END_TABLE_NAME)
+        end_response = end_table.scan()
+        end_items = end_response["items"]
+
+        while "lastevaluatedkey" in end_response:
+            end_response = end_table.scan(
+                exclusivestartkey=end_response["lastevaluatedkey"]
+            )
+            end_items.extend(end_response["items"])
+
+        prev_end = [
+            item for item in end_items if item[CHAPTERS_KEY_NAME] == prev_ch_key
+        ][0]
+
+    return prev_end
+
+
+def get_qnas(questions):
+    qnas = {}
+    dynamodb = boto3.resource("dynamodb")
+    questions_table = dynamodb.Table(QUESTIONS_TABLE_NAME)
+    for question_item in questions:
+        question = questions_table.get_item(
+            Key={QUESTIONS_ID_NAME: question_item["id"]}
+        )
+
+        qnas[question["content"]] = question["answer"]
+
+    return qnas
+
 
 def lambda_handler(event, context):
-    QUESTIONS_TABLE_NAME = "Questions"
-    QUESTIONS_ID_NAME = "question-id"
-    QUESTIONS_ANSWER_NAME = "answer"
-
-    INTRO_TABLE_NAME = "Intro"
-    INTRO_KEY_NAME = "ch-key"
-    INTRO_CONTENT_NAME = "content"
-    INTRO_OPTIONS_NAME = "options"
-
+    user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
     dynamodb = boto3.resource("dynamodb")
-
     # Create questions
     questions_table = dynamodb.Table(QUESTIONS_TABLE_NAME)
 
@@ -26,8 +94,11 @@ def lambda_handler(event, context):
             Item={QUESTIONS_ANSWER_NAME: question_item["answer"]},
         )
 
-    # generate intro
-    model_id = "amazon.nova-lite-v1:0"
+    previous_ending = get_prev_chapter_end(user_id)
+    print(previous_ending)
+
+    questionnaire = get_qnas(questions)
+    print(questionnaire)
 
     # Start a conversation with the user message.
     client = boto3.client("bedrock-runtime", region_name="us-east-1")
@@ -37,12 +108,12 @@ def lambda_handler(event, context):
         felt in the recent past, and in this very moment. You think about how you represented this character when 
         you recently left off writing 
 
-            {} 
+            {previous_ending} 
 
         Currently, to help inspire you to jump back into it, you write a short yes/no questionnaire for yourself 
         about how you were recently feeling: 
 
-            {}
+            {questionnaire}
 
         Now you are ready. Inspired by your responses, write a short slice of life inspired snippet for a character. 
         Stay gender neutral, and focus on the character's inner thoughts. Try to achieve around a 400 word snippet. 
@@ -57,7 +128,7 @@ def lambda_handler(event, context):
 
     # Send the message to the model, using a basic inference configuration.
     response = client.converse(
-        modelId=model_id,
+        modelId=MODEL_ID,
         messages=conversation,
         inferenceConfig={"maxTokens": 512, "temperature": 0.5, "topP": 0.9},
     )
@@ -71,6 +142,6 @@ def lambda_handler(event, context):
         Item={
             INTRO_KEY_NAME: body["ch-key"],
             INTRO_CONTENT_NAME: generated_content,
-            INTRO_OPTIONS_NAME: options_list,
+            INTRO_OPTIONS_NAME: "",
         }
     )
