@@ -20,7 +20,7 @@ Resources:
   IntroTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: intro
+      TableName: Intro
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: ch-key
@@ -50,13 +50,13 @@ Resources:
   QuestionsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: questions
+      TableName: Questions
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: ch-key
+        - AttributeName: question-id
           AttributeType: S
       KeySchema:
-        - AttributeName: ch-key
+        - AttributeName: question-id
           KeyType: HASH
       Tags:
         - Key: Name
