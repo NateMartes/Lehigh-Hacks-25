@@ -130,6 +130,16 @@ class CdkStack(Stack):
         )
         chapters_table.grant_read_write_data(test_dyndb_fn)
 
+        get_chapters_fn = _lambda.Function(
+            self,
+            "GetChaptersFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="get_chapters_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+            timeout=Duration.seconds(60),
+        )
+        chapters_table.grant_read_write_data(get_chapters_fn)
+
         api = apigw.RestApi(
             self,
             "LehighApiGw",
@@ -199,13 +209,11 @@ class CdkStack(Stack):
         test_bedrock_resource.add_method(
             "GET", apigw.LambdaIntegration(test_bedrock_fn)
         )
-
-        get_chapters_fn = _lambda.Function(
-            self,
-            "GetChaptersFunction",
-            runtime=_lambda.Runtime.PYTHON_3_13,
-            handler="get_chapters_function.lambda_handler",
-            code=_lambda.Code.from_asset("lambda"),
-            timeout=Duration.seconds(60),
+        
+        chapters_resource = api.root.add_resource("chapters")
+        chapters_resource.add_method(
+            "GET",
+            apigw.LambdaIntegration(get_chapters_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO
         )
-        chapters_table.grant_read_write_data(get_chapters_fn)
