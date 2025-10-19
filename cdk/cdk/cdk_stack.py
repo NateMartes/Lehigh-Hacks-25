@@ -112,6 +112,17 @@ class CdkStack(Stack):
             iam.ManagedPolicy.from_aws_managed_policy_name("AmazonBedrockFullAccess")
         )
 
+        gen_tts_fn = _lambda.Function(
+            self,
+            "GetTTSFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="get_tts_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+        )
+        gen_tts_fn.role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonPollyFullAccess")
+        )
+
         test_dyndb_fn = _lambda.Function(
             self,
             "TestDynDBFunction",
@@ -188,6 +199,14 @@ class CdkStack(Stack):
         end_resource.add_method(
             "POST",
             apigw.LambdaIntegration(gen_end_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO
+        )
+
+        tts_resource = api.root.add_resource("tts")
+        tts_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(gen_tts_fn),
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO
         )
