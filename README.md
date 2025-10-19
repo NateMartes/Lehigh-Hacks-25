@@ -1,4 +1,4 @@
-# Therapy through Create-Your-Own-Adventure Storytelling
+# SelfQuest: Therapy through Create-Your-Own-Adventure Storytelling
 ### Lehigh University Hackathon 2025 – Mental Health & Wellness Track
 
 ## Overview
