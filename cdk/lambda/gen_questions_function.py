@@ -16,7 +16,7 @@ QUESTIONS_ID_NAME = "question-id"
 QUESTIONS_CONTENT_NAME = "content"
 QUESTIONS_ANSWER_NAME = "answer"
 
-MODEL_ID = "amazon.nova-lite-v1:0"
+MODEL_ID = "us.meta.llama3-3-70b-instruct-v1:0"
 
 
 def gen_prompt(prev_end):
@@ -24,16 +24,16 @@ def gen_prompt(prev_end):
         return """
             You are a therapist trying to understand your patient's situation.
             You also write stories to help your patient be aware of their actions and
-            reframe their thoughts. Please generate five True or False questions to survey 
-            your patient and write a story. Please separate each question with the | symbol. 
+            reframe their thoughts. Please generate five questions that can be answered with yes or no
+            to survey your patient and write a story. Please separate each question with the | symbol. 
             Do not write anything else but the questions.
         """
 
     return f"""
         You are a therapist trying to understand your patient's situation.
         You also write stories to help your patient be aware of their actions and
-        reframe their thoughts. Please generate five True or False questions to survey your patient
-        and write a story. The questions can inquire about what has been done
+        reframe their thoughts. Please generate five questions that can be answered with yes or no
+        to survey your patient and write a story. The questions can inquire about what has been done
         since the last story. Here is the action the patient chose in the last story:
         {prev_end[END_CHOICE_NAME]}. Here is how the last story ended:
         {prev_end[END_CONTENT_NAME]}. Please separate each question with the | symbol.
@@ -70,8 +70,8 @@ def lambda_handler(event, context):
         if user_items:
             prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
             user_items.remove(prev_item)
-            prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
-            if prev_item:
+            if user_items:
+                prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
                 prev_ch_key = prev_item[CHAPTERS_KEY_NAME]
 
     prev_end = {}
@@ -101,13 +101,14 @@ def lambda_handler(event, context):
     ai_response_text = ai_response["output"]["message"]["content"][0]["text"]
 
     questions = ai_response_text.split("|")
-    questions_ids = [str(uuid.uuid4()) for q in questions]
+    questions = filter(lambda x: x != "" and not x.isspace(), questions)
+    questions = [q.strip() for q in questions]
 
     for i in range(len(questions)):
         questions_table.put_item(
             Item={
                 CHAPTERS_KEY_NAME: ch_key,
-                QUESTIONS_ID_NAME: questions_ids[i],
+                QUESTIONS_ID_NAME: str(uuid.uuid4()),
                 QUESTIONS_CONTENT_NAME: questions[i],
                 QUESTIONS_ANSWER_NAME: None,
             }

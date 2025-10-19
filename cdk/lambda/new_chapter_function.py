@@ -1,10 +1,6 @@
 import boto3
 import json
-import logging
 import uuid
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     CHAPTERS_TABLE_NAME = "Chapters"
