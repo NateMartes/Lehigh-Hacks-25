@@ -78,8 +78,6 @@ def get_qnas(questions):
 
     return qnas
 
-def create_options():
-
 
 def lambda_handler(event, context):
     user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
@@ -152,7 +150,7 @@ def lambda_handler(event, context):
     intro_table.put_item(
         Item={
             INTRO_KEY_NAME: body["ch-key"],
-            INTRO_CONTENT_NAME: generated_content,
+            INTRO_CONTENT_NAME: content,
             INTRO_OPTIONS_NAME: options_list,
         }
     )
