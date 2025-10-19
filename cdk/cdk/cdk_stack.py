@@ -69,6 +69,16 @@ class CdkStack(Stack):
             )
         )
 
+        get_questions_fn = _lambda.Function(
+            self,
+            "GetQuestionsFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="get_questions_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+            timeout=Duration.seconds(60)
+        )
+        questions_table.grant_read_write_data(get_questions_fn)
+
         test_dyndb_fn = _lambda.Function(
             self,
             "TestDynDBFunction",
@@ -115,6 +125,12 @@ class CdkStack(Stack):
         questions_resource.add_method(
             "POST",
             apigw.LambdaIntegration(gen_questions_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO
+        )
+        questions_resource.add_method(
+            "GET",
+            apigw.LambdaIntegration(get_questions_fn),
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO
         )
