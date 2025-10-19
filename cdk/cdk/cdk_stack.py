@@ -112,6 +112,26 @@ class CdkStack(Stack):
             iam.ManagedPolicy.from_aws_managed_policy_name("AmazonBedrockFullAccess")
         )
 
+        gen_tts_fn = _lambda.Function(
+            self,
+            "GetTTSFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="get_tts_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+        )
+        gen_tts_fn.role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonPollyFullAccess")
+        )
+
+        get_end_fn = _lambda.Function(
+            self,
+            "GetEndFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="get_end_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+        )
+        end_table.grant_read_write_data(get_end_fn)
+
         test_dyndb_fn = _lambda.Function(
             self,
             "TestDynDBFunction",
@@ -180,6 +200,14 @@ class CdkStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
+        get_end_resource = api.root.add_resource("get-end")
+        get_end_resource.add_method(
+            "GET",
+            apigw.LambdaIntegration(get_end_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO,
+        )
+
         questions_resource = api.root.add_resource("questions")
         questions_resource.add_method(
             "POST",
@@ -187,17 +215,25 @@ class CdkStack(Stack):
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
+
         questions_resource.add_method(
             "GET",
             apigw.LambdaIntegration(get_questions_fn),
             authorizer=authorizer,
-            authorization_type=apigw.AuthorizationType.COGNITO
+            authorization_type=apigw.AuthorizationType.COGNITO,
         )
-
         end_resource = api.root.add_resource("end")
         end_resource.add_method(
             "POST",
             apigw.LambdaIntegration(gen_end_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO,
+        )
+
+        tts_resource = api.root.add_resource("tts")
+        tts_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(gen_tts_fn),
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
