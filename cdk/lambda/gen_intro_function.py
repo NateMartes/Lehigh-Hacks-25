@@ -19,7 +19,7 @@ CHAPTERS_KEY_NAME = "ch-key"
 CHAPTERS_NUM_NAME = "ch-num"
 CHAPTERS_UID_NAME = "uid"
 
-MODEL_ID = "mistral.mistral-large-2402-v1:0"
+MODEL_ID = "us.meta.llama3-3-70b-instruct-v1:0"
 
 
 def gen_option_prompt(story, existing_options):
