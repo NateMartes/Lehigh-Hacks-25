@@ -118,6 +118,7 @@ class CdkStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_13,
             handler="gen_tts_function.lambda_handler",
             code=_lambda.Code.from_asset("lambda"),
+            timeout=Duration.seconds(60)
         )
         gen_tts_fn.role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name("AmazonPollyFullAccess")
