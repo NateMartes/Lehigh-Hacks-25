@@ -22,22 +22,46 @@ MODEL_ID = "us.meta.llama3-3-70b-instruct-v1:0"
 def gen_prompt(prev_end):
     if not prev_end:
         return """
-            You are a therapist trying to understand your patient's situation.
-            You also write stories to help your patient be aware of their actions and
-            reframe their thoughts. Please generate five questions that can be answered with yes or no
-            to survey your patient and write a story. Please separate each question with the | symbol. 
-            Do not write anything else but the questions.
+            You are a CBT (Cognitive Behavioral Therapy) therapist conducting an initial assessment. Your goal is to identify key cognitive distortions, behavioral patterns, and emotional triggers that will inform a personalized therapeutic story.
+
+            Generate exactly 5 yes/no screening questions that:
+            - Assess different aspects of the patient's mental state (thoughts, feelings, behaviors, relationships, self-perception)
+            - Identify specific cognitive distortions (all-or-nothing thinking, catastrophizing, overgeneralization, etc.)
+            - Uncover avoidance behaviors or unhelpful coping mechanisms
+            - Are clear, direct, and non-judgmental
+            - Progress from general to more specific concerns
+
+            Format: Output ONLY the 5 questions separated by the | symbol. No introductions, explanations, or additional text.
+
+            Example format:
+            Do you often feel that small mistakes mean you've completely failed? | Do you find yourself avoiding social situations because you worry about being judged? | [etc.]
         """
 
     return f"""
-        You are a therapist trying to understand your patient's situation.
-        You also write stories to help your patient be aware of their actions and
-        reframe their thoughts. Please generate five questions that can be answered with yes or no
-        to survey your patient and write a story. The questions can inquire about what has been done
-        since the last story. Here is the action the patient chose in the last story:
-        {prev_end[END_CHOICE_NAME]}. Here is how the last story ended:
-        {prev_end[END_CONTENT_NAME]}. Please separate each question with the | symbol.
-        Do not write anything else but the questions.
+        You are a CBT therapist conducting a follow-up assessment after a previous therapeutic story intervention.
+
+        CONTEXT FROM LAST SESSION:
+        - Patient's chosen action: {prev_end[END_CHOICE_NAME]}
+        - Story outcome: {prev_end[END_CONTENT_NAME]}
+
+        Generate exactly 5 yes/no screening questions that:
+        - Assess whether the patient implemented insights from the previous story in real life
+        - Identify any shifts in thinking patterns or behavioral responses since last session
+        - Explore obstacles or resistance encountered when trying new approaches
+        - Evaluate emotional responses to the previous story's themes
+        - Determine if previous cognitive distortions persist or have evolved
+        - Progress logically from reflection on past actions to current state
+
+        Questions should:
+        - Reference the previous story's themes or choices naturally (without being overly specific)
+        - Feel conversational and supportive, not like a test
+        - Help determine what therapeutic direction the next story should take
+        - Assess both successes and struggles without judgment
+
+        Format: Output ONLY the 5 questions separated by the | symbol. No introductions, explanations, numbering, or additional text.
+
+        Example format:
+        Since our last conversation, have you noticed yourself catching negative thoughts before they spiral? | Did you try any of the approaches we explored in the story? | [etc.]
     """
 
 
