@@ -104,7 +104,7 @@ class CdkStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_13,
             handler="gen_end_function.lambda_handler",
             code=_lambda.Code.from_asset("lambda"),
-            timeout=Duration.seconds(60)
+            timeout=Duration.seconds(60),
         )
         intro_table.grant_read_write_data(gen_end_fn)
         end_table.grant_read_write_data(gen_end_fn)
@@ -122,6 +122,15 @@ class CdkStack(Stack):
         gen_tts_fn.role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name("AmazonPollyFullAccess")
         )
+        
+        get_end_fn = _lambda.Function(
+            self,
+            "GetEndFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="get_end_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+        )
+        end_table.grant_read_write_data(get_end_fn)
 
         test_dyndb_fn = _lambda.Function(
             self,
@@ -165,7 +174,7 @@ class CdkStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
-        gen_intro_resource = api.root.add_resource("intro")
+        gen_intro_resource = api.root.add_resource("gen-intro")
         gen_intro_resource.add_method(
             "POST",
             apigw.LambdaIntegration(gen_intro_fn),
@@ -173,10 +182,18 @@ class CdkStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
-        get_intro_resource = api.root.add_resource("intro")
+        get_intro_resource = api.root.add_resource("get-intro")
         get_intro_resource.add_method(
             "GET",
             apigw.LambdaIntegration(get_intro_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO,
+        )
+
+        get_end_resource = api.root.add_resource("get-end")
+        get_end_resource.add_method(
+            "GET",
+            apigw.LambdaIntegration(get_end_fn),
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
@@ -188,9 +205,18 @@ class CdkStack(Stack):
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
+
         questions_resource.add_method(
             "GET",
             apigw.LambdaIntegration(get_questions_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO
+        )
+
+        end_resource = api.root.add_resource("end")
+        end_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(gen_end_fn),
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
@@ -200,7 +226,7 @@ class CdkStack(Stack):
             "POST",
             apigw.LambdaIntegration(gen_end_fn),
             authorizer=authorizer,
-            authorization_type=apigw.AuthorizationType.COGNITO
+            authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
         tts_resource = api.root.add_resource("tts")
@@ -218,3 +244,13 @@ class CdkStack(Stack):
         test_bedrock_resource.add_method(
             "GET", apigw.LambdaIntegration(test_bedrock_fn)
         )
+
+        get_chapters_fn = _lambda.Function(
+            self,
+            "GetChaptersFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="get_chapters_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+            timeout=Duration.seconds(60),
+        )
+        chapters_table.grant_read_write_data(get_chapters_fn)
