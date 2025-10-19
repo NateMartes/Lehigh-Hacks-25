@@ -16,7 +16,7 @@ class CdkStack(Stack):
 
         user_pool = cognito.UserPool.from_user_pool_id(
             self, "UserPool",
-            user_pool_id="client37abc1f7_userpool_37abc1f7-dev"
+            user_pool_id="us-east-1_Mq1Lp3b0h"
         )
 
         authorizer = apigw.CognitoUserPoolsAuthorizer(
