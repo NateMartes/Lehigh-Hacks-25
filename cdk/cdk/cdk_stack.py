@@ -75,7 +75,18 @@ class CdkStack(Stack):
         )
         chapters_table.grant_read_write_data(test_dyndb_fn)
 
-        api = apigw.RestApi(self, "LehighApiGw", rest_api_name="LehighApiGw")
+        api = apigw.RestApi(
+            self,
+            "LehighApiGw",
+            rest_api_name="LehighApiGw",
+            default_cors_preflight_options=apigw.CorsOptions(
+                allow_origins=["*"],
+                allow_methods=["GET", "POST", "OPTIONS"],
+                allow_headers=["Content-Type", "Authorization"],
+                allow_credentials=True,
+                status_code=200
+            )
+        )
 
         test_resource = api.root.add_resource("test")
         test_resource.add_method("GET", apigw.LambdaIntegration(test_fn))
