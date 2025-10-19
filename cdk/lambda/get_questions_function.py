@@ -1,4 +1,5 @@
 import boto3
+import json
 
 def lambda_handler(event, context):
     QUESTIONS_TABLE_NAME = "Questions"
@@ -34,7 +35,7 @@ def lambda_handler(event, context):
         "headers": {
             "Access-Control-Allow-Origin": "*"
         },
-        "body": {
+        "body": json.dumps({
             "questions": questions
-        }
+        })
     }
