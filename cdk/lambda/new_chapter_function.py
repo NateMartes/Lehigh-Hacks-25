@@ -42,7 +42,7 @@ def lambda_handler(event, context):
             CHAPTERS_UID_NAME: user_id,
         }
     )
-
+    
     return {
         "statusCode": 200,
         "headers": {
