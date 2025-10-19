@@ -25,13 +25,13 @@ def lambda_handler(event, context):
     for item in items:
         if item[CHAPTERS_KEY_NAME] == ch_key:
             intro_body = {
-                "intro_content": item[INTRO_CONTENT_NAME],
-                "intro_options": item[INTRO_OPTIONS_NAME],
+                "content": item[INTRO_CONTENT_NAME],
+                "options": item[INTRO_OPTIONS_NAME],
             }
             break
 
     return {
         "statusCode": 200,
         "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps({"questions": intro_body}),
+        "body": json.dumps({"body": intro_body}),
     }
