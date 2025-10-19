@@ -8,6 +8,7 @@ END_OPTIONS_NAME = "options"
 
 
 def lambda_handler(event, context):
+    print(f"event: {event}")
     query_params = event["queryStringParameters"]
     ch_key = query_params["ch-key"]
 
