@@ -25,14 +25,13 @@ def lambda_handler(event, context):
         if item[CHAPTERS_UID_NAME] == uid:
             chapters.append({
                     "ch-key": item[CHAPTERS_KEY_NAME],
-                    "ch-num": item[CHAPTERS_NUM_NAME]
-                }
-            )
+                    "ch-num": int(item[CHAPTERS_NUM_NAME])
+            })
 
     chapters = sorted(chapters, key=lambda item: item["ch-num"])
 
     return {
         "statusCode": 200,
         "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps({"chapters": chapters}),
+        "body": json.dumps({"chapters": chapters})
     }
