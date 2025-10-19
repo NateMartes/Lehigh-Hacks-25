@@ -122,7 +122,7 @@ class CdkStack(Stack):
         gen_tts_fn.role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name("AmazonPollyFullAccess")
         )
-        
+
         get_end_fn = _lambda.Function(
             self,
             "GetEndFunction",
@@ -210,17 +210,8 @@ class CdkStack(Stack):
             "GET",
             apigw.LambdaIntegration(get_questions_fn),
             authorizer=authorizer,
-            authorization_type=apigw.AuthorizationType.COGNITO
-        )
-
-        end_resource = api.root.add_resource("end")
-        end_resource.add_method(
-            "POST",
-            apigw.LambdaIntegration(gen_end_fn),
-            authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
-
         end_resource = api.root.add_resource("end")
         end_resource.add_method(
             "POST",
@@ -234,7 +225,7 @@ class CdkStack(Stack):
             "POST",
             apigw.LambdaIntegration(gen_tts_fn),
             authorizer=authorizer,
-            authorization_type=apigw.AuthorizationType.COGNITO
+            authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
         test_dyndb_resource = api.root.add_resource("testdyndb")
@@ -254,3 +245,4 @@ class CdkStack(Stack):
             timeout=Duration.seconds(60),
         )
         chapters_table.grant_read_write_data(get_chapters_fn)
+
