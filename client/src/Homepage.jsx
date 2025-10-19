@@ -23,7 +23,8 @@ async function getAllChapters(updateChaptersFunc) {
       });
 
       let data = await response.json();
-      updateChaptersFunc(data);
+      setGettingChapters(false);
+      updateChaptersFunc(data.chapters);
 
     } catch (error) {
       console.log("Error" + error);
@@ -36,11 +37,12 @@ export default function ChapterList() {
 
   const [creatingNewChapter, setCreatingNewChapter] = useState(false);
   const [chapters, setChapters] = useState([]);
+  const [gettingChapters, setGettingChapters] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     async function run() {
-      await getAllChapters();
+      await getAllChapters(setChapters, setGettingChapters);
     }
     run();
   }, [])
@@ -88,13 +90,19 @@ export default function ChapterList() {
           </div>
           <div className="flex flex-col gap-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {chapters.map((card) => (
-                <Card key={card.number} data-chapter={card.ch_key} data-number={card.number} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={handleCardClick}>
+              {!gettingChapters && (chapters.map((card) => (
+                <Card key={card["ch-num"]} data-chapter={card["ch-key"]} data-number={card["ch-num"]} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={handleCardClick}>
                   <CardHeader>
-                    <CardTitle className="text-xl">Chapter {card.number}</CardTitle>
+                    <CardTitle className="text-xl">Chapter {card["ch-num"]}</CardTitle>
                   </CardHeader>
                 </Card>
-              ))}
+              )))}
+              {gettingChapters && (
+                <div className="flex w-svw gap-6">
+                  <p className="text-xl lg:text-2xl font-bold">Getting Chapters ...</p>
+                  <Spinner className="h-12 w-12"/>
+                </div>
+              )}
             </div>
             <div className="flex gap-6">
               <Button className="text-white font-semibold py-2 px-6 rounded-lg
