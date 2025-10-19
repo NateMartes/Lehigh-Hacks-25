@@ -11,7 +11,7 @@ END_TABLE_NAME = "End"
 END_CHOICE_NAME = "choice"
 END_CONTENT_NAME = "content"
 
-MODEL_ID = "amazon.nova-lite-v1:0"
+MODEL_ID = "us.meta.llama3-3-70b-instruct-v1:0"
 
 
 def gen_prompt(intro_item, choice):
