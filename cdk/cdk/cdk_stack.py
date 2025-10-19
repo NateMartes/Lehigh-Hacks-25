@@ -114,9 +114,9 @@ class CdkStack(Stack):
 
         gen_tts_fn = _lambda.Function(
             self,
-            "GetTTSFunction",
+            "GenTTSFunction",
             runtime=_lambda.Runtime.PYTHON_3_13,
-            handler="get_tts_function.lambda_handler",
+            handler="gen_tts_function.lambda_handler",
             code=_lambda.Code.from_asset("lambda"),
         )
         gen_tts_fn.role.add_managed_policy(
