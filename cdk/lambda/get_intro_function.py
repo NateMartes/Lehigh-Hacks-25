@@ -1,4 +1,5 @@
 import boto3
+import json
 
 CHAPTERS_KEY_NAME = "ch-key"
 INTRO_TABLE_NAME = "Intro"
@@ -31,5 +32,5 @@ def lambda_handler(event, context):
     return {
         "statusCode": 200,
         "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": {"questions": intro_content},
+        "body": json.dumps({"questions": intro_content}),
     }
