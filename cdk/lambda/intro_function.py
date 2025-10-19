@@ -145,3 +145,5 @@ def lambda_handler(event, context):
             INTRO_OPTIONS_NAME: "",
         }
     )
+
+    return {"statusCode": 200, "headers": {"Access-Control-Allow-Origin": "*"}}
