@@ -28,12 +28,11 @@ class CdkStack(Stack):
         chapters_table = dynamodb.Table.from_table_name(
             self, "ChaptersTable", "Chapters"
         )
-        end_table = dynamodb.Table.from_table_name(
-            self, "EndTable", "End"
-        )
+        end_table = dynamodb.Table.from_table_name(self, "EndTable", "End")
         questions_table = dynamodb.Table.from_table_name(
             self, "QuestionsTable", "Questions"
         )
+        intro_table = dynamodb.Table.from_table_name(self, "IntroTable", "End")
 
         test_fn = _lambda.Function(
             self,
@@ -58,15 +57,29 @@ class CdkStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_13,
             handler="gen_questions_function.lambda_handler",
             code=_lambda.Code.from_asset("lambda"),
-            timeout=Duration.seconds(60)
+            timeout=Duration.seconds(60),
         )
         chapters_table.grant_read_write_data(gen_questions_fn)
         end_table.grant_read_write_data(gen_questions_fn)
         questions_table.grant_read_write_data(gen_questions_fn)
         gen_questions_fn.role.add_managed_policy(
-            iam.ManagedPolicy.from_aws_managed_policy_name(
-                "AmazonBedrockFullAccess"
-            )
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonBedrockFullAccess")
+        )
+
+        gen_intro_fn = _lambda.Function(
+            self,
+            "GenIntroFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="gen_intro_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+            timeout=Duration.seconds(60),
+        )
+        chapters_table.grant_read_write_data(gen_intro_fn)
+        end_table.grant_read_write_data(gen_intro_fn)
+        questions_table.grant_read_write_data(gen_intro_fn)
+        intro_table.grant_read_write_data(gen_intro_fn)
+        gen_intro_fn.role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonBedrockFullAccess")
         )
 
         get_questions_fn = _lambda.Function(
@@ -106,8 +119,8 @@ class CdkStack(Stack):
                 allow_methods=["*"],
                 allow_headers=["*"],
                 allow_credentials=True,
-                status_code=200
-            )
+                status_code=200,
+            ),
         )
 
         test_resource = api.root.add_resource("test")
@@ -120,6 +133,9 @@ class CdkStack(Stack):
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO
         )
+
+        gen_intro_resource = api.root.add_resource("intro")
+        gen_intro_resource.add_method("POST", apigw.LambdaIntegration(gen_intro_fn))
 
         questions_resource = api.root.add_resource("questions")
         questions_resource.add_method(
