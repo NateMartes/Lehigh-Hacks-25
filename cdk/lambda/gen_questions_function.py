@@ -70,8 +70,8 @@ def lambda_handler(event, context):
         if user_items:
             prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
             user_items.remove(prev_item)
-            prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
-            if prev_item:
+            if user_items:
+                prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
                 prev_ch_key = prev_item[CHAPTERS_KEY_NAME]
 
     prev_end = {}
