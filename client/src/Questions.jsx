@@ -1,8 +1,68 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { fetchAuthSession } from 'aws-amplify/auth';
 import NavBar from './NavBar';
+
+async function makeQuestions(key) {
+    try {
+      const token = (await fetchAuthSession()).tokens.idToken;
+      await fetch('https://0y2e52zyqa.execute-api.us-east-1.amazonaws.com/prod/questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          "ch-key": key
+        })
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+}
+
+async function getQuestions(key) {
+    console.log("getQuestions Called")
+    try {
+      const token = (await fetchAuthSession()).tokens.idToken;
+      const response = await fetch(`https://0y2e52zyqa.execute-api.us-east-1.amazonaws.com/prod/questions?ch-key=${key}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+}
+
+async function createIntro(questions, key) {
+    try {
+      const token = (await fetchAuthSession()).tokens.idToken;
+      await fetch(`https://0y2e52zyqa.execute-api.us-east-1.amazonaws.com/prod/intro`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          "questions": questions,
+          "ch-key": key
+        })
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+}
 
 function Question({ question, onAnswer, answered }) {
   return (
@@ -41,26 +101,24 @@ export default function QuestionList() {
   const [answers, setAnswers] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [questions, setQuestions] = useState([]);
+  const [creatingIntro, setCreatingIntro] = useState(false);
 
   const params = useParams();
+  const key = params.chKey;
   const navigate = useNavigate();
   const { state } = useLocation();
 
   useEffect(() => {
-
-    // Get questions for new chapter
-
-    setQuestions([
-        'Do you enjoy coding?',
-        'Is JavaScript your favorite language?',
-        'Do you like working in teams?',
-        'Have you used React before?',
-        'Do you prefer frontend development?',
-    ])
-
+    async function run() {
+        await makeQuestions(key);
+        let data = await getQuestions(key);
+        console.log(data);
+        setQuestions(data.questions);
+    }
+    run();
   }, [])
 
-  function handleAnswer(answer) {
+  async function handleAnswer(answer) {
 
     setAnswers((prev) => ({
       ...prev,
@@ -74,6 +132,14 @@ export default function QuestionList() {
 
     } else {
         let key = params.chKey;
+        let answeredQuestions = questions.map((q, index) => {
+          return {
+            "question-id": q["question-id"],
+            "answer": answers[index]
+          }
+        })
+        setCreatingIntro(true);
+        await createIntro(answeredQuestions, key);
         navigate(`/chapter/${key}`, {state: {number: state.number}});
     }
   };
@@ -83,7 +149,7 @@ export default function QuestionList() {
   return (
     <>
       <NavBar/>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
+      {(questions.length > 0 && !creatingIntro)  && (<div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-slate-900 mb-2">Reflection</h1>
@@ -101,13 +167,27 @@ export default function QuestionList() {
 
           <div className="mb-8">
               <Question
-                question={questions[currentIndex]}
+                question={questions[currentIndex]["content"]}
                 onAnswer={handleAnswer}
                 answered={answers[currentIndex] !== undefined}
               />
           </div>
         </div>
-      </div>
+      </div>)}
+
+      {(questions.length == 0) && (
+        <div className="flex flex-col justify-center place-items-center h-svh gap-6">
+          <p className="text-xl lg:text-2xl font-bold">Getting Reflections ...</p>
+          <Spinner className="h-12 w-12"/>
+        </div>
+        )}
+
+      {creatingIntro && (
+        <div className="flex flex-col justify-center place-items-center h-svh gap-6">
+          <p className="text-xl lg:text-2xl font-bold">Creating a New Chapter For You ...</p>
+          <Spinner className="h-12 w-12"/>
+        </div>
+        )}
     </>
   );
 }
