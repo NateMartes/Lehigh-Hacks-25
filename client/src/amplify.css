@@ -1,0 +1,135 @@
+/* Amplify Gen 1 CSS Variable Overrides */
+:root,
+[data-amplify-authenticator] {
+  /* Primary Color - Black */
+  --amplify-primary-color: #000000;
+  --amplify-primary-tint: #1f1f1f;
+  
+  /* Secondary Color - Amber */
+  --amplify-secondary-color: #f59e0b;
+  --amplify-secondary-tint: #f59e0b;
+  
+  /* Font Colors */
+  --amplify-font-color: #1f2937;
+  --amplify-font-secondary: #6b7280;
+  
+  /* Background */
+  --amplify-background-color: #f3f4f6;
+  
+  /* Override Blue to Amber */
+  --amplify-colors-blue-10: #fffbeb;
+  --amplify-colors-blue-20: #fef3c7;
+  --amplify-colors-blue-40: #fde68a;
+  --amplify-colors-blue-60: #f59e0b;
+  --amplify-colors-blue-80: #f59e0b;
+  --amplify-colors-blue-90: #d97706;
+  --amplify-colors-blue-100: #b45309;
+}
+
+/* Button Styles */
+.amplify-button--primary {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.amplify-button--primary:hover {
+  background-color: #fbbf24 !important;
+  color: #ffffff !important;
+}
+
+.amplify-button--primary:active,
+.amplify-button--primary:focus {
+  background-color: #f59e0b !important;
+  color: #ffffff !important;
+}
+
+/* Secondary Buttons */
+.amplify-button--secondary {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #e5e7eb !important;
+}
+
+.amplify-button--secondary:hover {
+  border-color: #fbbf24 !important;
+  color: #fbbf24 !important;
+  background-color: #ffffff !important;
+}
+
+.amplify-button--small {
+    color: #000000 !important
+}
+
+.amplify-button--small:hover {
+  border-color: #fbbf24 !important;
+  color: #ffffff !important;
+  background-color: #fbbf24 !important;
+}
+
+/* Input Fields */
+.amplify-input,
+.amplify-input input,
+.amplify-textfield input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"] {
+  border-color: #e5e7eb !important;
+  color: #1f2937 !important;
+}
+
+.amplify-input input:focus,
+.amplify-textfield input:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1) !important;
+}
+
+/* Labels and Text */
+.amplify-label,
+.amplify-text,
+label {
+  color: #1f2937 !important;
+}
+
+/* Links */
+.amplify-text-link,
+.amplify-link,
+a {
+  color: #fbbf24 !important;
+}
+
+.amplify-text-link:hover,
+.amplify-link:hover
+a:hover,
+.amplify-tabs__item:hover {
+  color: #f59e0b !important;
+}
+
+/* Tab CSS Variables */
+:root,
+[data-amplify-authenticator] {
+  --amplify-components-tabs-item-color: #6b7280 !important;
+  --amplify-components-tabs-item-active-color: #fbbf24 !important;
+  --amplify-components-tabs-item-active-border-color: #fbbf24 !important;
+}
+
+/* Container Backgrounds */
+.amplify-authenticator,
+.amplify-form-section,
+[data-amplify-authenticator] {
+  background-color: #f3f4f6 !important;
+}
+
+/* Error and Success Messages */
+.amplify-error {
+  color: #ef4444 !important;
+}
+
+.amplify-success {
+  color: #10b981 !important;
+}
