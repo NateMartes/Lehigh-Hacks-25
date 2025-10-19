@@ -199,3 +199,13 @@ class CdkStack(Stack):
         test_bedrock_resource.add_method(
             "GET", apigw.LambdaIntegration(test_bedrock_fn)
         )
+
+        get_chapters_fn = _lambda.Function(
+            self,
+            "GetChaptersFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="get_chapters_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+            timeout=Duration.seconds(60),
+        )
+        chapters_table.grant_read_write_data(get_chapters_fn)
