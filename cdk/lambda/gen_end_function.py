@@ -15,23 +15,29 @@ MODEL_ID = "amazon.nova-lite-v1:0"
 
 
 def gen_prompt(intro_item, choice):
-    return f"""
-        Pretend you are a storyteller writing a character, and you are inspired by some of your emotions you have 
-        felt in the recent past. You had started a choose-your-own-adventure story like this:
-        
-        {intro_item[INTRO_CONTENT_NAME]}
+    return f"""You are writing a therapeutic storytelling exercise. This is a continuation of a character-driven narrative.
 
-        You then provided the following options:
+    PREVIOUS STORY SEGMENT:
+    {intro_item[INTRO_CONTENT_NAME]}
 
-        {intro_item[INTRO_OPTIONS_NAME]}
+    CHOICES THAT WERE OFFERED:
+    1. {intro_item[INTRO_OPTIONS_NAME][0]}
+    2. {intro_item[INTRO_OPTIONS_NAME][1]}
+    3. {intro_item[INTRO_OPTIONS_NAME][2]}
 
-        The following choice was selected:
+    THE CHOICE MADE:
+    {choice}
 
-        {choice}
+    YOUR TASK:
+    Write a 300-400 word continuation that:
+    - Shows the immediate consequence of this choice
+    - Focuses on the character's internal emotional response and thoughts
+    - Uses gender-neutral language (they/them pronouns)
+    - Ends with a reflective moment that invites the reader to consider their own feelings
+    - Uses a compassionate, introspective tone suitable for therapeutic self-reflection
+    - Concludes the story arc with emotional resolution or insight
 
-        Now you are ready. Inspired by the choice made, end the story with possibility for reflection. 
-        Stay gender neutral, and focus on the character's inner thoughts. Give no more than a 400 word snippet.
-    """
+    Write the continuation now:"""
 
 
 def lambda_handler(event, context):
@@ -82,4 +88,3 @@ def lambda_handler(event, context):
     )
 
     return {"statusCode": 200, "headers": {"Access-Control-Allow-Origin": "*"}}
-
