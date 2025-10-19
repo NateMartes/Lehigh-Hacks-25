@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { useLocation, useParams } from 'react-router-dom'
 import { fetchAuthSession } from 'aws-amplify/auth';
 import NavBar from "./NavBar";
 import ScrollToTopButton from "./ScrollToTopButton";
+import TextToSpeechBtn from "./TextToSpeech";
 
 async function getChapterIntro(key) {
     try {
@@ -66,6 +68,7 @@ function Chapter() {
   const [end, setEnd] = useState("");
   const [options, setOptions] = useState([]);
   const [choice, setChoice] = useState("");
+  const [gettingEnd, setGettingEnd] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [showEnd, setShowEnd] = useState(false);
   const { state } = useLocation();
@@ -75,6 +78,7 @@ function Chapter() {
   function getFormattedText(text) {
     const paragraphLength = 5;
 
+    console.log(`Text: ${text}`)
     const sentences = text.split('.').map(s => s.trim()).filter(Boolean);
 
     const paragraphs = [];
@@ -95,86 +99,33 @@ function Chapter() {
 
   useEffect(() => {
     async function run () {
-      let key = params["key"]
+      let key = params["chKey"]
       let data = await getChapterIntro(key);
-      setIntro(data.content);
-      setOptions(data.options);
+      setIntro(data.body.content);
+      setOptions(data.body.options);
+      let endData = await getChapterEnd(key);
+      if (Object.keys(endData.body).length === 0) {
+        setShowOptions(true);
+      } else {
+          setChoice(endData.body.choice);
+          setEnd(endData.body.content);
+          setShowEnd(true);
+      }
     }
     run();
-    let chKey = "ch1";
-    let introData = {
-      ch_key: chKey,
-      content: `Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.`,
-      options: [
-        "Do option A",
-        "Do option B",
-        "Do option C"
-      ]
-    };
-    setIntro(introData.content);
-    setOptions(introData.options);
-    /*
-    // Get end data. If end data returns a 404, then we will show the options
-    let endData = {}
-    let showOptions = false;
-    if (Object.keys(endData).length === 0) {
-      showOptions = true;
-    } else {
-      setEnd(endData.content);
-      setChoice(endData.option);
-    }
-
-    setShowOptions(showOptions);
-    setShowEnd(!showOptions);
-    */
   }, []);
 
   async function handleOptionClick(option) {
     
+    let key = params["chKey"]
     setShowOptions(false);
+    setGettingEnd(true);
     await makeChapterEnd(option, key);
-    let data = getChapterEnd(key);
-    setChoice(data.option);
-    setEnd(data.content);
-
-    let endData = {
-      ch_key: "my-random-key",
-      content: `Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
-                React allows developers to create reusable UI components, making development faster and easier to maintain.
-                With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.`,
-      option: "Do option A"
-    }
-    setEnd(endData.content);
+    let data = await getChapterEnd(key);
+    console.log(data);
+    setGettingEnd(false);
+    setChoice(data.body.choice);
+    setEnd(data.body.content);
     setShowEnd(true);
   };
 
@@ -183,7 +134,10 @@ function Chapter() {
       <NavBar/>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8 flex flex-col items-center justify-center">
         <div className="max-w-2xl w-full">
-          <h1 className="text-left text-4xl font-bold text-slate-900 mb-8">Chapter {chapterNum}</h1>
+          <div className="flex items-center gap-6 mb-6">
+            <h1 className="text-4xl font-bold text-slate-900">Chapter {chapterNum}</h1>
+            <TextToSpeechBtn text={intro}/>
+          </div>
           <div className="text-left text-xl lg:text-2xl [word-spacing:0.1em] leading-relaxed text-slate-900 mb-16">
             {getFormattedText(intro)}
           </div>
@@ -195,10 +149,12 @@ function Chapter() {
                   <Button
                     key={index}
                     onClick={() => handleOptionClick(option)}
-                    className="text-white font-semibold py-2 px-6 rounded-lg
-                              transform transition duration-300 ease-in-out
-                              hover:bg-amber-500 hover:scale-105 hover:shadow-lg
-                              active:scale-95 active:bg-amber-700 cusror-pointer"
+                    className="w-full text-white font-semibold px-4 py-8 sm:px-6 rounded-lg
+                  transform transition duration-300 ease-in-out
+                hover:bg-amber-500 hover:scale-105 hover:shadow-lg
+                  active:scale-95 active:bg-amber-700 cursor-pointer
+                  text-sm sm:text-base lg:text-lg
+                  whitespace-normal break-words"
                   >
                     {option}
                   </Button>
@@ -219,8 +175,13 @@ function Chapter() {
             </div>
           )}
 
-          <ScrollToTopButton />
+          {gettingEnd && (
+            <div className="flex flex-col justify-center place-items-center gap-6">
+              <Spinner className="h-12 w-12"/>
+            </div>
+            )}
 
+          <ScrollToTopButton />
         </div>
       </div>
     </>

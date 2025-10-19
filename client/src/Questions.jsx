@@ -120,10 +120,12 @@ export default function QuestionList() {
 
   async function handleAnswer(answer) {
 
-    setAnswers((prev) => ({
-      ...prev,
+    const updatedAnswers = {
+      ...answers,
       [currentIndex]: answer,
-    }));
+    };
+
+    setAnswers(updatedAnswers);
 
     if (currentIndex < questions.length - 1) {
       setTimeout(() => {
@@ -133,11 +135,14 @@ export default function QuestionList() {
     } else {
         let key = params.chKey;
         let answeredQuestions = questions.map((q, index) => {
+          console.log(q)
+          console.log(index)
           return {
             "question-id": q["question-id"],
-            "answer": answers[index]
+            "answer": updatedAnswers[index]
           }
         })
+        console.log(answeredQuestions)
         setCreatingIntro(true);
         await createIntro(answeredQuestions, key);
         navigate(`/chapter/${key}`, {state: {number: state.number}});
