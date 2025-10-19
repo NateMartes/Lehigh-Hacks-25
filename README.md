@@ -27,7 +27,7 @@ Our goal: create a space that feels like reading a story—but secretly feels li
 | Layer | Technologies Used | Purpose |
 |-------|-------------------|----------|
 | **Frontend** | React, Tailwind CSS, shadcn/ui | Smooth, modern UI for immersive storytelling |
-| **Backend** | Python (FastAPI), AWS Lambda, API Gateway | Serverless backend for adaptive logic and API orchestration |
+| **Backend** | Python, AWS Lambda, API Gateway | Serverless backend for adaptive logic and API orchestration |
 | **AI & Story Engine** | Claude (Anthropic) via AWS Bedrock | Contextual narrative generation and emotional adaptation |
 | **Database** | DynamoDB | Stores user session data and narrative progression |
 | **Middleware / SDKs** | AWS Boto3 | Secure communication and orchestration between services |
@@ -59,7 +59,6 @@ Our goal: create a space that feels like reading a story—but secretly feels li
 
 ## What’s Next
 - Collaborate with therapists to add guided coping paths and emotional safety checks.
-- Expand to mobile (React Native) for accessibility and on-the-go reflection.
 - Introduce mood progression visualization through narrative arcs.
 - Build persistent characters that evolve alongside the user’s choices and emotions.
 
