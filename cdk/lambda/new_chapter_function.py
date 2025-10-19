@@ -1,6 +1,10 @@
 import boto3
+import json
+import logging
 import uuid
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     CHAPTERS_TABLE_NAME = "Chapters"
@@ -44,8 +48,8 @@ def lambda_handler(event, context):
         "headers": {
             "Access-Control-Allow-Origin": "*"
         },
-        "body": {
+        "body": json.dumps({
             "ch-key": ch_key,
             "ch-num": ch_num
-        }
+        })
     }
