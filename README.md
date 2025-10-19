@@ -28,14 +28,14 @@ Our goal: create a space that feels like reading a story—but secretly feels li
 |-------|-------------------|----------|
 | **Frontend** | React, Tailwind CSS, shadcn/ui | Smooth, modern UI for immersive storytelling |
 | **Backend** | Python, AWS Lambda, API Gateway | Serverless backend for adaptive logic and API orchestration |
-| **AI & Story Engine** | Claude (Anthropic) via AWS Bedrock | Contextual narrative generation and emotional adaptation |
+| **AI & Story Engine** | Meta Llama via AWS Bedrock | Contextual narrative generation and emotional adaptation |
 | **Database** | DynamoDB | Stores user session data and narrative progression |
 | **Middleware / SDKs** | AWS Boto3 | Secure communication and orchestration between services |
 
 ### Architecture Summary
 1. User logs in and answers screening questions.
 2. API Gateway triggers a Python-based AWS Lambda function that processes responses.
-3. The Lambda function calls Claude (via AWS Bedrock) to generate adaptive story content.
+3. The Lambda function calls Llama (via AWS Bedrock) to generate adaptive story content.
 4. Responses and user data persist in DynamoDB for continuity.
 5. The React frontend renders the generated chapter with smooth UI transitions via shadcn and Tailwind, enabling branching prompts and real-time interaction.
 
@@ -52,7 +52,7 @@ Our goal: create a space that feels like reading a story—but secretly feels li
 ## Challenges We Overcame
 - Translating emotional data from simple yes/no responses into nuanced narrative tones.
 - Balancing creativity with emotional sensitivity and avoiding prescriptive “therapy talk.”
-- Integrating Claude (Anthropic) through AWS Bedrock and managing latency in real time.
+- Integrating Meta Llama through AWS Bedrock and managing latency in real time.
 - Designing an interface that feels like a storybook rather than a questionnaire.
 
 ---
