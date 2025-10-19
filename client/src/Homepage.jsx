@@ -5,13 +5,45 @@ import NavBar from './NavBar';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { Spinner } from '@/components/ui/spinner';
 import ScrollToTopButton from './ScrollToTopButton';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+async function getAllChapters(updateChaptersFunc) {
+    const session = await fetchAuthSession();
+    const idToken = session.tokens?.idToken;
+    const payload = idToken?.payload;
+    const userId = payload?.sub;
+
+    try {
+      const response = await fetch(`https://0y2e52zyqa.execute-api.us-east-1.amazonaws.com/prod/chapters?uid=${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        } 
+      });
+
+      let data = await response.json();
+      updateChaptersFunc(data);
+
+    } catch (error) {
+      console.log("Error" + error);
+      throw error;
+    }
+
+}
 
 export default function ChapterList() {
 
   const [creatingNewChapter, setCreatingNewChapter] = useState(false);
+  const [chapters, setChapters] = useState([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    async function run() {
+      await getAllChapters();
+    }
+    run();
+  }, [])
   function handleCardClick(event) {
     let key = event.currentTarget.dataset.chapter;
     let number = event.currentTarget.dataset.number;
@@ -46,21 +78,6 @@ export default function ChapterList() {
     navigate(`/survey/${key}`, {state: {number: number}});  
   }
 
-  const cards = [
-    {
-      number: 1,
-      ch_key: 'abc',
-    },
-    {
-      number: 2,
-      ch_key: 'abcd',
-    },
-    {
-      number: 3,
-      ch_key: 'abcde',
-    },
-  ];
-
   return (
     <>
       <NavBar />
@@ -71,7 +88,7 @@ export default function ChapterList() {
           </div>
           <div className="flex flex-col gap-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {cards.map((card) => (
+              {chapters.map((card) => (
                 <Card key={card.number} data-chapter={card.ch_key} data-number={card.number} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={handleCardClick}>
                   <CardHeader>
                     <CardTitle className="text-xl">Chapter {card.number}</CardTitle>
