@@ -15,14 +15,11 @@ class CdkStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         user_pool = cognito.UserPool.from_user_pool_id(
-            self, "UserPool",
-            user_pool_id="us-east-1_Mq1Lp3b0h"
+            self, "UserPool", user_pool_id="us-east-1_Mq1Lp3b0h"
         )
 
         authorizer = apigw.CognitoUserPoolsAuthorizer(
-            self,
-            "CognitoAuthorizer",
-            cognito_user_pools=[user_pool]
+            self, "CognitoAuthorizer", cognito_user_pools=[user_pool]
         )
 
         chapters_table = dynamodb.Table.from_table_name(
@@ -81,6 +78,16 @@ class CdkStack(Stack):
         gen_intro_fn.role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name("AmazonBedrockFullAccess")
         )
+
+        get_intro_fn = _lambda.Function(
+            self,
+            "GetIntroFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="get_intro_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+            timeout=Duration.seconds(60),
+        )
+        intro_table.grant_read_write_data(get_intro_fn)
 
         get_questions_fn = _lambda.Function(
             self,
@@ -144,24 +151,37 @@ class CdkStack(Stack):
             "POST",
             apigw.LambdaIntegration(new_chapter_fn),
             authorizer=authorizer,
-            authorization_type=apigw.AuthorizationType.COGNITO
+            authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
         gen_intro_resource = api.root.add_resource("intro")
-        gen_intro_resource.add_method("POST", apigw.LambdaIntegration(gen_intro_fn))
+        gen_intro_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(gen_intro_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO,
+        )
+
+        get_intro_resource = api.root.add_resource("intro")
+        get_intro_resource.add_method(
+            "GET",
+            apigw.LambdaIntegration(get_intro_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO,
+        )
 
         questions_resource = api.root.add_resource("questions")
         questions_resource.add_method(
             "POST",
             apigw.LambdaIntegration(gen_questions_fn),
             authorizer=authorizer,
-            authorization_type=apigw.AuthorizationType.COGNITO
+            authorization_type=apigw.AuthorizationType.COGNITO,
         )
         questions_resource.add_method(
             "GET",
             apigw.LambdaIntegration(get_questions_fn),
             authorizer=authorizer,
-            authorization_type=apigw.AuthorizationType.COGNITO
+            authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
         end_resource = api.root.add_resource("end")

@@ -1,8 +1,64 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { Button } from '@/components/ui/button';
+import { useLocation, useParams } from 'react-router-dom'
 import NavBar from "./NavBar";
 import ScrollToTopButton from "./ScrollToTopButton";
+
+async function getChapterIntro(key) {
+    try {
+      const token = (await fetchAuthSession()).tokens.idToken;
+      const response = await fetch(`https://0y2e52zyqa.execute-api.us-east-1.amazonaws.com/prod/intro?ch-key=${key}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        } 
+      });
+
+      return await response.json();
+    } catch (error) {
+
+      console.error('Error:', error);
+      throw error;
+    }
+}
+
+async function makeChapterEnd(option, key) {
+    try {
+      const token = (await fetchAuthSession()).tokens.idToken;
+      await fetch(`https://0y2e52zyqa.execute-api.us-east-1.amazonaws.com/prod/end`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          "ch-key": key,
+          "choice": option 
+        })
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+}
+
+async function getChapterEnd(key) {
+    try {
+      const token = (await fetchAuthSession()).tokens.idToken;
+      let response = await fetch(`https://0y2e52zyqa.execute-api.us-east-1.amazonaws.com/prod/end?ch-key=${key}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return await response.json()
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+}
 
 function Chapter() {
   const [intro, setIntro] = useState("");
@@ -13,6 +69,7 @@ function Chapter() {
   const [showEnd, setShowEnd] = useState(false);
   const { state } = useLocation();
   const chapterNum = state.number;
+  const params = useParams();
 
   function getFormattedText(text) {
     const paragraphLength = 5;
@@ -36,6 +93,13 @@ function Chapter() {
 
 
   useEffect(() => {
+    async function run () {
+      let key = params["key"]
+      let data = await getChapterIntro(key);
+      setIntro(data.content);
+      setOptions(data.options);
+    }
+    run();
     let chKey = "ch1";
     let introData = {
       ch_key: chKey,
@@ -62,13 +126,11 @@ function Chapter() {
         "Do option C"
       ]
     };
-
-    // Get end data. If end data returns a 404, then we will show the options
-    let endData = {}
-
     setIntro(introData.content);
     setOptions(introData.options);
-
+    /*
+    // Get end data. If end data returns a 404, then we will show the options
+    let endData = {}
     let showOptions = false;
     if (Object.keys(endData).length === 0) {
       showOptions = true;
@@ -79,13 +141,17 @@ function Chapter() {
 
     setShowOptions(showOptions);
     setShowEnd(!showOptions);
+    */
   }, []);
 
-  function handleOptionClick(option) {
+  async function handleOptionClick(option) {
+    
     setShowOptions(false);
-    setChoice(option);
+    await makeChapterEnd(option, key);
+    let data = getChapterEnd(key);
+    setChoice(data.option);
+    setEnd(data.content);
 
-    // Make and get end
     let endData = {
       ch_key: "my-random-key",
       content: `Welcome to the world of coding! Learning React is one of the best ways to build modern web applications.
@@ -107,7 +173,6 @@ function Chapter() {
                 With a bit of practice, you'll be building interactive and dynamic user interfaces in no time.`,
       option: "Do option A"
     }
-  
     setEnd(endData.content);
     setShowEnd(true);
   };

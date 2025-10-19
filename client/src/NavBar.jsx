@@ -23,7 +23,7 @@ export default function NavBar() {
           onClick={handleHomeClick}
           className="text-2xl font-semibold tracking-tight cusror-pointer text-foreground cursor-pointer hover:opacity-80 transition-opacity"
         >
-          Lehigh Hacks
+          SelfQuest
         </h1>
         <p className="text-lg text-slate-600 hidden lg:block ">Therapy through Create-Your-Own-Adventure Storytelling</p>
 
