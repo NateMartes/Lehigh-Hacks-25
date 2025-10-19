@@ -1,10 +1,10 @@
 import boto3
 import json
 
+END_TABLE_NAME = "End"
 CHAPTERS_KEY_NAME = "ch-key"
-INTRO_TABLE_NAME = "Intro"
-INTRO_CONTENT_NAME = "content"
-INTRO_OPTIONS_NAME = "options"
+END_CONTENT_NAME = "content"
+END_OPTIONS_NAME = "options"
 
 
 def lambda_handler(event, context):
@@ -12,26 +12,28 @@ def lambda_handler(event, context):
     ch_key = query_params["ch-key"]
 
     dynamodb = boto3.resource("dynamodb")
-    intro_table = dynamodb.Table(INTRO_TABLE_NAME)
+    end_table = dynamodb.Table(END_TABLE_NAME)
 
-    response = intro_table.scan()
+    response = end_table.scan()
     items = response["Items"]
 
     while "LastEvaluatedKey" in response:
-        response = intro_table.scan(ExclusiveStartKey=response["LastEvaluatedKey"])
+        response = end_table.scan = end_table.scan(
+            ExclusiveStartKey=response["LastEvaluatedKey"]
+        )
         items.extend(response["Items"])
 
-    intro_body = {}
+    end_content = {}
     for item in items:
         if item[CHAPTERS_KEY_NAME] == ch_key:
-            intro_body = {
-                "intro_content": item[INTRO_CONTENT_NAME],
-                "intro_options": item[INTRO_OPTIONS_NAME],
+            end_content = {
+                "end_content": item[END_CONTENT_NAME],
+                "option_selected": item[END_OPTIONS_NAME],
             }
             break
 
     return {
         "statusCode": 200,
         "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps({"questions": intro_body}),
+        "body": json.dumps({"body": end_content}),
     }
