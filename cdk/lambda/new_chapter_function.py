@@ -38,5 +38,13 @@ def lambda_handler(event, context):
             CHAPTERS_UID_NAME: user_id,
         }
     )
-
-    return {"statusCode": 200, "ch-key": ch_key, "ch-num": ch_num}
+    
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": {
+            "ch-key": ch_key,
+            "ch-num": ch_num
+        }
