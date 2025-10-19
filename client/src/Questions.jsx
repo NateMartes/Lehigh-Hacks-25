@@ -14,13 +14,19 @@ function Question({ question, onAnswer, answered }) {
           <div className="flex gap-3 mt-6">
             <Button
               onClick={() => onAnswer(false)}
-              className="flex-1 bg-red-500 hover:bg-red-600"
+              className="flex-1 text-white font-semibold py-2 px-6 rounded-lg
+                              transform transition duration-300 ease-in-out
+                              hover:bg-amber-500 hover:scale-105 hover:shadow-lg
+                              active:scale-95 active:bg-amber-700 cusror-pointer"
             >
               No
             </Button>
             <Button
               onClick={() => onAnswer(true)}
-              className="flex-1 bg-green-400 hover:bg-green-500"
+              className="flex-1 text-white font-semibold py-2 px-6 rounded-lg
+                              transform transition duration-300 ease-in-out
+                              hover:bg-amber-500 hover:scale-105 hover:shadow-lg
+                              active:scale-95 active:bg-amber-700 cusror-pointer"
             >
               Yes
             </Button>
@@ -80,7 +86,7 @@ export default function QuestionList() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Quick Survey</h1>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Reflection</h1>
             
             <div className="w-full bg-slate-200 rounded-full h-2">
               <div

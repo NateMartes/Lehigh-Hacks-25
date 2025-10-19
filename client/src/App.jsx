@@ -1,10 +1,10 @@
-import { useState } from 'react'
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ChapterList from './ChapterList';
+import ChapterList from './Homepage';
 import Chapter from './Chapter';
 import QuestionList from './Questions';
 import '@aws-amplify/ui-react/styles.css';
+import './amplify.css';
 
 function App() {
   return (
