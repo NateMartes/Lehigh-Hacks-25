@@ -101,7 +101,9 @@ def lambda_handler(event, context):
     ai_response_text = ai_response["output"]["message"]["content"][0]["text"]
 
     questions = ai_response_text.split("|")
-    questions_ids = [str(uuid.uuid4()) for q in questions]
+    questions = filter(lambda x: x != "" and not x.isspace(), questions)
+    questions = [q.strip() for q in questions]
+    questions_ids = [str(uuid.uuid4()) for _ in questions]
 
     for i in range(len(questions)):
         questions_table.put_item(
