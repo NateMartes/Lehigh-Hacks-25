@@ -88,9 +88,22 @@ class CdkStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_13,
             handler="get_questions_function.lambda_handler",
             code=_lambda.Code.from_asset("lambda"),
-            timeout=Duration.seconds(60)
         )
         questions_table.grant_read_write_data(get_questions_fn)
+
+        gen_end_fn = _lambda.Function(
+            self,
+            "GenEndFunction",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="gen_end_function.lambda_handler",
+            code=_lambda.Code.from_asset("lambda"),
+            timeout=Duration.seconds(60)
+        )
+        intro_table.grant_read_write_data(gen_end_fn)
+        end_table.grant_read_write_data(gen_end_fn)
+        gen_end_fn.role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonBedrockFullAccess")
+        )
 
         test_dyndb_fn = _lambda.Function(
             self,
@@ -149,6 +162,14 @@ class CdkStack(Stack):
             apigw.LambdaIntegration(get_questions_fn),
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO
+        )
+
+        end_resource = api.root.add_resource("end")
+        end_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(gen_end_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.Authorization.COGNITO
         )
 
         test_dyndb_resource = api.root.add_resource("testdyndb")
