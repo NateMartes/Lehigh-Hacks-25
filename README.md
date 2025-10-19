@@ -1,5 +1,5 @@
 # SelfQuest
 
-Therapy through Create-Your-OwnAdve
+Therapy through Create-Your-Own-Adventure Storytelling
 
 
