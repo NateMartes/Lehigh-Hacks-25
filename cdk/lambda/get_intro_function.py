@@ -8,6 +8,7 @@ INTRO_OPTIONS_NAME = "options"
 
 
 def lambda_handler(event, context):
+    print(event)
     query_params = event["queryStringParameters"]
     ch_key = query_params["ch-key"]
 
@@ -17,12 +18,15 @@ def lambda_handler(event, context):
     response = intro_table.scan()
     items = response["Items"]
 
+    print(f"db items: {items}")
+
     while "LastEvaluatedKey" in response:
         response = intro_table.scan(ExclusiveStartKey=response["LastEvaluatedKey"])
         items.extend(response["Items"])
 
     intro_body = {}
     for item in items:
+        print(f"Item: {item}")
         if item[CHAPTERS_KEY_NAME] == ch_key:
             intro_body = {
                 "content": item[INTRO_CONTENT_NAME],
@@ -30,6 +34,7 @@ def lambda_handler(event, context):
             }
             break
 
+    print(f"intro body: {intro_body}")
     return {
         "statusCode": 200,
         "headers": {"Access-Control-Allow-Origin": "*"},

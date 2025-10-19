@@ -13,6 +13,7 @@ END_CONTENT_NAME = "content"
 
 MODEL_ID = "amazon.nova-lite-v1:0"
 
+
 def gen_prompt(intro_item, choice):
     return f"""
         Pretend you are a storyteller writing a character, and you are inspired by some of your emotions you have 
@@ -29,8 +30,9 @@ def gen_prompt(intro_item, choice):
         {choice}
 
         Now you are ready. Inspired by the choice made, end the story with possibility for reflection. 
-        Stay gender neutral, and focus on the character's inner thoughts. Try to achieve around a 400 word snippet.
+        Stay gender neutral, and focus on the character's inner thoughts. Give no more than a 400 word snippet.
     """
+
 
 def lambda_handler(event, context):
     body = json.loads(event["body"])
@@ -49,7 +51,9 @@ def lambda_handler(event, context):
     intro_items = intro_response["Items"]
 
     while "LastEvaluatedKey" in intro_response:
-        intro_response = intro_table.scan(ExclusiveStartKey=intro_response["LastEvaluatedKey"])
+        intro_response = intro_table.scan(
+            ExclusiveStartKey=intro_response["LastEvaluatedKey"]
+        )
         intro_items.extend(intro_response["Items"])
 
     ch_intro = None
@@ -73,8 +77,9 @@ def lambda_handler(event, context):
         Item={
             CHAPTERS_KEY_NAME: ch_key,
             END_CHOICE_NAME: choice,
-            END_CONTENT_NAME: story_end
+            END_CONTENT_NAME: story_end,
         }
     )
 
     return {"statusCode": 200, "headers": {"Access-Control-Allow-Origin": "*"}}
+

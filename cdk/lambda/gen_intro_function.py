@@ -19,7 +19,7 @@ CHAPTERS_KEY_NAME = "ch-key"
 CHAPTERS_NUM_NAME = "ch-num"
 CHAPTERS_UID_NAME = "uid"
 
-MODEL_ID = "amazon.nova-lite-v1:0"
+MODEL_ID = "us.meta.llama3-3-70b-instruct-v1:0"
 
 
 def get_prev_chapter_end(user_id):
@@ -41,8 +41,8 @@ def get_prev_chapter_end(user_id):
         if user_items:
             prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
             user_items.remove(prev_item)
-            prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
-            if prev_item:
+            if user_items:
+                prev_item = max(user_items, key=lambda x: int(x[CHAPTERS_NUM_NAME]))
                 prev_ch_key = prev_item[CHAPTERS_KEY_NAME]
 
     prev_end = {}
@@ -73,9 +73,10 @@ def get_qnas(questions):
         question = questions_table.get_item(
             Key={QUESTIONS_ID_NAME: question_item["question-id"]}
         )
+        print(f"db question: {question}")
 
-        print
-        qnas[question["content"]] = question["answer"]
+        print(f"question item: {question_item}")
+        qnas[question["Item"]["content"]] = question["Item"]["answer"]
 
     return qnas
 
@@ -97,10 +98,10 @@ def lambda_handler(event, context):
         )
 
     previous_ending = get_prev_chapter_end(user_id)
-    print(previous_ending)
+    print(f"previous ending {previous_ending}")
 
     questionnaire = get_qnas(questions)
-    print(questionnaire)
+    print(f"questionnaire {questionnaire}")
 
     # Start a conversation with the user message.
     client = boto3.client("bedrock-runtime", region_name="us-east-1")
@@ -120,7 +121,7 @@ def lambda_handler(event, context):
         Now you are ready. Inspired by your responses, write a short slice of life inspired snippet for a character. 
         Stay gender neutral, and focus on the character's inner thoughts. Try to achieve around a 400 word snippet. 
         End the snippet with a decision to make, and give 3 choices for the reader to make. Partition your response using vertical bars like so:
-        story || question1 || question2 || question3. do not label your sections or questions 
+        story || question1 || question2 || question3. Each option should be no more than 10 words. do not label your sections or questions 
     """
 
     conversation = [
@@ -152,7 +153,7 @@ def lambda_handler(event, context):
     intro_table.put_item(
         Item={
             INTRO_KEY_NAME: body["ch-key"],
-            INTRO_CONTENT_NAME: generated_content,
+            INTRO_CONTENT_NAME: content,
             INTRO_OPTIONS_NAME: options_list,
         }
     )

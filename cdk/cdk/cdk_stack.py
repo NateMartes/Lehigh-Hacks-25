@@ -29,7 +29,7 @@ class CdkStack(Stack):
         questions_table = dynamodb.Table.from_table_name(
             self, "QuestionsTable", "Questions"
         )
-        intro_table = dynamodb.Table.from_table_name(self, "IntroTable", "End")
+        intro_table = dynamodb.Table.from_table_name(self, "IntroTable", "Intro")
 
         test_fn = _lambda.Function(
             self,
