@@ -107,21 +107,30 @@ def lambda_handler(event, context):
     client = boto3.client("bedrock-runtime", region_name="us-east-1")
 
     ai_intro_gen_query = f"""
-        Pretend you are a storyteller writing a character, and you are inspired by some of your emotions you have 
-        felt in the recent past, and in this very moment. You think about how you represented this character when 
-        you recently left off writing 
+        You are crafting an interactive narrative designed to explore emotional experiences through storytelling. This is part of a therapeutic exercise using CBT principles.
+        Context: You previously wrote: {previous_ending}
+        Emotional Check-in: {questionnaire}
+        Your Task:
+        Write a 350-400 word introspective scene featuring a gender-neutral character navigating a relatable, everyday situation. The scene should:
 
-            {previous_ending} 
+        Reflect the emotional themes from the questionnaire responses naturally within the narrative
+        Use internal monologue to show the character's thought patterns, beliefs, and emotional reactions
+        Ground the story in concrete, sensory details - what the character sees, hears, feels physically
+        Build toward a meaningful decision point that connects to the character's emotional state
+        Avoid dramatic extremes - keep situations realistic and relatable (workplace moments, social interactions, personal routines, family dynamics)
+        Show, don't tell - reveal emotions through thoughts and physical sensations rather than labeling them
 
-        Currently, to help inspire you to jump back into it, you write a short yes/no questionnaire for yourself 
-        about how you were recently feeling: 
+        Style Guidelines:
 
-            {questionnaire}
+        Use present tense for immediacy
+        Keep the character's name ambiguous or use "they/them"
+        Focus on one specific moment or scene
+        End at a natural decision point where the character must choose how to respond
 
-        Now you are ready. Inspired by your responses, write a short slice of life inspired snippet for a character. 
-        Stay gender neutral, and focus on the character's inner thoughts. Try to achieve around a 400 word snippet. 
-        End the snippet with a decision to make, and give 3 choices for the reader to make. Partition your response using vertical bars like so:
-        story || question1 || question2 || question3. Each option should be no more than 10 words. do not label your sections or questions 
+        Format your response exactly as:
+        [story text] || [choice 1] || [choice 2] || [choice 3]
+        Each choice should be 6-10 words and represent meaningfully different approaches to the situation (e.g., avoidance vs. engagement, emotional vs. rational response, self-compassionate vs. self-critical). The choices should feel authentic to what someone might actually consider in that moment.
+        Do not include labels, headers, or explanatory text - only the story and three choices separated by || 
     """
 
     conversation = [
