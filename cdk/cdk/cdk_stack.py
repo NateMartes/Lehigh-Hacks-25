@@ -2,6 +2,7 @@ from aws_cdk import (
     Duration,
     Stack,
     aws_apigateway as apigw,
+    aws_cognito as cognito,
     aws_dynamodb as dynamodb,
     aws_iam as iam,
     aws_lambda as _lambda,
@@ -12,6 +13,17 @@ from constructs import Construct
 class CdkStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        user_pool = cognito.UserPool.from_user_pool_id(
+            self, "UserPool",
+            user_pool_id="client37abc1f7_userpool_37abc1f7-dev"
+        )
+
+        authorizer = apigw.CognitoUserPoolsAuthorizer(
+            self,
+            "CognitoAuthorizer",
+            cognito_user_pools=[user_pool]
+        )
 
         chapters_table = dynamodb.Table.from_table_name(
             self, "ChaptersTable", "Chapters"
@@ -81,8 +93,8 @@ class CdkStack(Stack):
             rest_api_name="LehighApiGw",
             default_cors_preflight_options=apigw.CorsOptions(
                 allow_origins=["*"],
-                allow_methods=["GET", "POST", "OPTIONS"],
-                allow_headers=["Content-Type", "Authorization"],
+                allow_methods=["*"],
+                allow_headers=["*"],
                 allow_credentials=True,
                 status_code=200
             )
@@ -92,10 +104,20 @@ class CdkStack(Stack):
         test_resource.add_method("GET", apigw.LambdaIntegration(test_fn))
 
         new_resource = api.root.add_resource("new")
-        new_resource.add_method("POST", apigw.LambdaIntegration(new_chapter_fn))
+        new_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(new_chapter_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO
+        )
 
         questions_resource = api.root.add_resource("questions")
-        questions_resource.add_method("POST", apigw.LambdaIntegration(gen_questions_fn))
+        questions_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(gen_questions_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO
+        )
 
         test_dyndb_resource = api.root.add_resource("testdyndb")
         test_dyndb_resource.add_method("POST", apigw.LambdaIntegration(test_dyndb_fn))
