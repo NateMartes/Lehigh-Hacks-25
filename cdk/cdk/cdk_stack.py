@@ -184,26 +184,31 @@ class CdkStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
-        gen_intro_resource = api.root.add_resource("gen-intro")
-        gen_intro_resource.add_method(
+        intro_resource = api.root.add_resource("intro")
+        intro_resource.add_method(
             "POST",
             apigw.LambdaIntegration(gen_intro_fn),
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
-        get_intro_resource = api.root.add_resource("get-intro")
-        get_intro_resource.add_method(
+        intro_resource.add_method(
             "GET",
             apigw.LambdaIntegration(get_intro_fn),
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
 
-        get_end_resource = api.root.add_resource("get-end")
-        get_end_resource.add_method(
+        end_resource = api.root.add_resource("end")
+        end_resource.add_method(
             "GET",
             apigw.LambdaIntegration(get_end_fn),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO,
+        )
+        end_resource.add_method(
+            "POST",
+            apigw.LambdaIntegration(gen_end_fn),
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
@@ -222,14 +227,6 @@ class CdkStack(Stack):
             authorizer=authorizer,
             authorization_type=apigw.AuthorizationType.COGNITO,
         )
-        end_resource = api.root.add_resource("end")
-        end_resource.add_method(
-            "POST",
-            apigw.LambdaIntegration(gen_end_fn),
-            authorizer=authorizer,
-            authorization_type=apigw.AuthorizationType.COGNITO,
-        )
-
         tts_resource = api.root.add_resource("tts")
         tts_resource.add_method(
             "POST",
@@ -245,11 +242,11 @@ class CdkStack(Stack):
         test_bedrock_resource.add_method(
             "GET", apigw.LambdaIntegration(test_bedrock_fn)
         )
-        
+
         chapters_resource = api.root.add_resource("chapters")
         chapters_resource.add_method(
             "GET",
             apigw.LambdaIntegration(get_chapters_fn),
             authorizer=authorizer,
-            authorization_type=apigw.AuthorizationType.COGNITO
+            authorization_type=apigw.AuthorizationType.COGNITO,
         )

@@ -50,13 +50,13 @@ def get_prev_chapter_end(user_id):
         dynamodb = boto3.resource("dynamodb")
         end_table = dynamodb.Table(END_TABLE_NAME)
         end_response = end_table.scan()
-        end_items = end_response["items"]
+        end_items = end_response["Items"]
 
-        while "lastevaluatedkey" in end_response:
+        while "LastEvaluatedKey" in end_response:
             end_response = end_table.scan(
-                exclusivestartkey=end_response["lastevaluatedkey"]
+                ExclusiveStartKey=end_response["LastEvaluatedKey"]
             )
-            end_items.extend(end_response["items"])
+            end_items.extend(end_response["Items"])
 
         prev_end = [
             item for item in end_items if item[CHAPTERS_KEY_NAME] == prev_ch_key
@@ -85,11 +85,11 @@ def lambda_handler(event, context):
     # Create questions
     questions_table = dynamodb.Table(QUESTIONS_TABLE_NAME)
 
-    questions = json.loads(event["body"]["questions"])
+    questions = json.loads(event["body"])["questions"]
     for question_item in questions:
         questions_table.update_item(
             Key={
-                QUESTIONS_ID_NAME: question_item["id"],
+                QUESTIONS_ID_NAME: question_item["question-id"],
             },
             Item={QUESTIONS_ANSWER_NAME: question_item["answer"]},
         )
@@ -135,22 +135,22 @@ def lambda_handler(event, context):
         inferenceConfig={"maxTokens": 512, "temperature": 0.5, "topP": 0.9},
     )
 
-    content = response.split("||")[0]
-    option1 = response.split("||")[1]
-    option2 = response.split("||")[2]
-    option3 = response.split("||")[3]
-
-    options_list = [option1, option2, option3]
-
     # Extract and print the response text.
     generated_content = response["output"]["message"]["content"][0]["text"]
+
+    content = generated_content.split("||")[0]
+    option1 = generated_content.split("||")[1]
+    option2 = generated_content.split("||")[2]
+    option3 = generated_content.split("||")[3]
+
+    options_list = [option1, option2, option3]
 
     body = json.loads(event["body"])
     intro_table = dynamodb.Table(INTRO_TABLE_NAME)
     intro_table.put_item(
         Item={
             INTRO_KEY_NAME: body["ch-key"],
-            INTRO_CONTENT_NAME: content,
+            INTRO_CONTENT_NAME: generated_content,
             INTRO_OPTIONS_NAME: options_list,
         }
     )
