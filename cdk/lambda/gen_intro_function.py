@@ -19,8 +19,23 @@ CHAPTERS_KEY_NAME = "ch-key"
 CHAPTERS_NUM_NAME = "ch-num"
 CHAPTERS_UID_NAME = "uid"
 
-MODEL_ID = "us.meta.llama3-3-70b-instruct-v1:0"
+MODEL_ID = "mistral.mistral-large-2402-v1:0"
 
+
+def gen_option_prompt(story, existing_options):
+    return f"""
+        Based on the following story and decision point, generate one meaningful choice the character could make.
+        Story: {story}
+        Previously generated options: {existing_options}
+        Your Task:
+        Create one choice (6-10 words) that:
+
+        Represents a distinct approach from the existing options
+        Feels authentic to what someone might actually consider in this moment
+        Reflects a different response pattern (e.g., avoidance vs. engagement, emotional vs. rational, self-compassionate vs. self-critical, active vs. passive)
+
+        Output only the choice text with no labels, explanations, or additional formatting.
+    """
 
 def get_prev_chapter_end(user_id):
     dynamodb = boto3.resource("dynamodb")
@@ -106,7 +121,8 @@ def lambda_handler(event, context):
     # Start a conversation with the user message.
     client = boto3.client("bedrock-runtime", region_name="us-east-1")
 
-    ai_intro_gen_query = f"""
+    ai_story_gen_query = f"""
+        PROMPT 1: Story Generation
         You are crafting an interactive narrative designed to explore emotional experiences through storytelling. This is part of a therapeutic exercise using CBT principles.
         Context: You previously wrote: {previous_ending}
         Emotional Check-in: {questionnaire}
@@ -125,35 +141,47 @@ def lambda_handler(event, context):
         Use present tense for immediacy
         Keep the character's name ambiguous or use "they/them"
         Focus on one specific moment or scene
-        End at a natural decision point where the character must choose how to respond
+        End at a clear decision point where the character must choose how to respond
 
-        Format your response exactly as:
-        [story text] || [choice 1] || [choice 2] || [choice 3]
-        Each choice should be 6-10 words and represent meaningfully different approaches to the situation (e.g., avoidance vs. engagement, emotional vs. rational response, self-compassionate vs. self-critical). The choices should feel authentic to what someone might actually consider in that moment.
-        Do not include labels, headers, or explanatory text - only the story and three choices separated by || 
+        Do not include any choices or options - only write the story ending at the decision point.
     """
 
-    conversation = [
+    story_conversation = [
         {
             "role": "user",
-            "content": [{"text": ai_intro_gen_query}],
+            "content": [{"text": ai_story_gen_query}],
         }
     ]
 
     # Send the message to the model, using a basic inference configuration.
     response = client.converse(
         modelId=MODEL_ID,
-        messages=conversation,
+        messages=story_conversation,
         inferenceConfig={"maxTokens": 512, "temperature": 0.5, "topP": 0.9},
     )
-
     # Extract and print the response text.
-    generated_content = response["output"]["message"]["content"][0]["text"]
+    generated_story = response["output"]["message"]["content"][0]["text"]
 
-    content = generated_content.split("||")[0]
-    option1 = generated_content.split("||")[1]
-    option2 = generated_content.split("||")[2]
-    option3 = generated_content.split("||")[3]
+    existing_options = []
+    for i in range(3):
+        option_gen_prompt = gen_option_prompt(generated_story, existing_options)
+        conversation = [
+            {
+                "role": "user",
+                "content": [{"text": option_gen_prompt}]
+            }
+        ]
+        response = client.converse(
+            modelId=MODEL_ID,
+            messages=conversation,
+            inferenceConfig={"maxTokens": 50, "temperature": 0.5, "topP": 0.9}
+        )
+        existing_options.append(response["output"]["message"]["content"][0]["text"])
+
+    content = generated_story
+    option1 = existing_options[0]
+    option2 = existing_options[1]
+    option3 = existing_options[2]
 
     options_list = [option1, option2, option3]
 
