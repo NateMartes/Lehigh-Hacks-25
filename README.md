@@ -24,11 +24,11 @@ Our goal: create a space that feels like reading a story—but secretly feels li
 
 ## Building and Deploying
 
-# Website (Frontend)
+###  Website (Frontend)
 
 The website uses AWS Amplify to handle user authentication along with hosting.
 
-## Testing the Website
+#### Testing the Website
 
 The website can be tested using Vite's dev script. In the `/client` directory, run:
 ```bash
@@ -38,7 +38,7 @@ npm run dev
 
 This will start a development server.
 
-## Deploying the Website
+#### Deploying the Website
 
 The website can be deployed using AWS Amplify Gen 1 CLI:
 ```bash
@@ -64,11 +64,11 @@ You can update an already published website by updating the local codebase and r
 amplify publish -c
 ```
 
-# API (Backend)
+### API (Backend)
 
 The API uses AWS Lambda along with the Cloud Development Kit. You will need the CDK CLI tool installed.
 
-## Deploying the API
+#### Deploying the API
 
 Deploying the API can be done by being in the `/cdk` directory and running:
 
@@ -83,11 +83,11 @@ You can remove the API by running:
 cdk destroy CdkStack
 ```
 
-# AI and Text-to-Speech
+### AI and Text-to-Speech
 
 The AI and Polly are handled by the Lambda functions and the CDK stack.
 
-# Database
+### Database
 
 The database uses DynamoDB and has a CloudFormation file for deployment. In the `cloudformations` directory, run:
 ```bash
