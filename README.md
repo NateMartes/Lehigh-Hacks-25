@@ -22,6 +22,81 @@ Our goal: create a space that feels like reading a story—but secretly feels li
 
 ---
 
+## Building and Deploying
+
+# Website (Frontend)
+
+The website uses AWS Amplify to handle user authentication along with hosting.
+
+## Testing the Website
+
+The website can be tested using Vite's dev script. In the `/client` directory, run:
+```bash
+npm install
+npm run dev
+```
+
+This will start a development server.
+
+## Deploying the Website
+
+The website can be deployed using AWS Amplify Gen 1 CLI:
+```bash
+npm install -g @aws-amplify/cli
+amplify configure
+```
+
+Then in the `/client` directory, run:
+```bash
+amplify init
+amplify add auth # Pick 'Default Configuration -> Username -> No, I'm Done'
+amplify add hosting # Pick 'Amazon CloudFront and S3'
+amplify push
+```
+
+You can finally deploy your website by publishing:
+```bash
+amplify publish
+```
+
+You can update an already published website by updating the local codebase and running:
+```bash
+amplify publish -c
+```
+
+# API (Backend)
+
+The API uses AWS Lambda along with the Cloud Development Kit. You will need the CDK CLI tool installed.
+
+## Deploying the API
+
+Deploying the API can be done by being in the `/cdk` directory and running:
+
+**NOTE:** Make sure the Cognito user pool ID defined in the `cdk_stack.py` file is consistent with the user pool ID deployed by the frontend.
+```bash
+cdk synth
+cdk deploy
+```
+
+You can remove the API by running:
+```bash
+cdk destroy CdkStack
+```
+
+# AI and Text-to-Speech
+
+The AI and Polly are handled by the Lambda functions and the CDK stack.
+
+# Database
+
+The database uses DynamoDB and has a CloudFormation file for deployment. In the `cloudformations` directory, run:
+```bash
+aws cloudformation create-stack \
+    --stack-name MyStack \
+    --template-body file://dynamo-template.yaml \
+    --region us-east-1
+```
+
 ## Tech Stack
 
 | Layer | Technologies Used | Purpose |
